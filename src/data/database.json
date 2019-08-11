@@ -1,0 +1,20 @@
+[
+  {
+    "id" : 1,
+    "title" : "Hello, World!",
+    "content" : "Açaí",
+    "slug" : "hello-world"
+  },
+  {
+    "id" : 2,
+    "title" : "bonjour, monde!",
+    "content" : "Maçã",
+    "slug" : "bonjour-monde"
+  },
+  {
+    "id" : 3,
+    "title" : "Hola Mundo",
+    "content" : "Açúcar",
+    "slug" : "hola-mundo"
+  }
+]
