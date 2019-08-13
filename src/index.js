@@ -7,7 +7,8 @@ import './index.css';
 //DONE -- https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
 //DONE -- puxar as funções para fora da class App
 //DONE -- fazer update na tela
-// -- criar um form para dar Add
+//DONE -- criar um form para dar Add
+// --  dar Add
 //Tentar deixar mais dry
 
 //Começar a planejar o hate-game
@@ -41,17 +42,7 @@ function Poste(props){
   },
 */
 
-const formValid = formErrors =>{
-
-  console.log('hi!');
-  console.log(Object.values);
-
-  let valid = true;
-
-  Object.values(formErrors).forEach(val => val.length > 0 && (valid = false));
-  return valid;
-}
-
+/*
 class Formulario extends React.Component {
   constructor(props){
     super(props);
@@ -63,13 +54,21 @@ class Formulario extends React.Component {
       slug: null,
       aprove: true
     }
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
-  handleSubmit = e =>{
-    e.preventDefault();
 
-    //console.log(this.state.title);
-    console.log(this);
+  handleChange(event){
+    this.setState({title: event.target.title, content: event.target.content})
+  }
+
+  handleSubmit(event){
+    event.preventDefault();
+
+    console.log(this.state.content);
+    //console.log(this);
   }
 
   render(){
@@ -80,22 +79,22 @@ class Formulario extends React.Component {
             <label htmlFor="title">Greeting: </label>
             <input 
               type="text" 
+              value={this.state.title}
+              onChange={this.handleChange}
               className="titleInput" 
               placeholder="First title" 
               name="title"
-              value={this.state.title}
-              noValidate
             />
           </div>
           <div className="content">
-            <label htmlFor="content">Greeting: </label>
+            <label htmlFor="content">text here: </label>
             <input 
               type="text" 
+              value={this.state.content}
+              onChange={this.handleChange}
               className="contentInput" 
               placeholder="word content" 
               name="content"
-              value={this.state.content}
-              noValidate
             />
           </div>
           <div className="createEntry">
@@ -106,6 +105,40 @@ class Formulario extends React.Component {
     );
   }
 }
+*/
+
+class NameForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {value: ''};
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({value: event.target.value});
+  }
+
+  handleSubmit(event) {
+    alert('A name was submitted: ' + this.state.value);
+    event.preventDefault();
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Name:
+          <input type="text" value={this.state.value} onChange={this.handleChange} />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    );
+  }
+}
+
+
 
   class PostList extends React.Component {
     renderItem(item){
@@ -175,7 +208,7 @@ class Formulario extends React.Component {
       return (
         <div className='App'>
           <h1>Hellos</h1>
-          <Formulario
+          <NameForm
 
           />
           <PostList
