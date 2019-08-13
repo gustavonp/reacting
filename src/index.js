@@ -19,20 +19,6 @@ function createDB(){
   localStorage.setItem('conteudo', myData);
 }
 
-/*
-function removeDb(toRemove){
-  let numero = JSON.parse(localStorage.getItem('conteudo'));
-  for(let i = 0; i < numero.length; i++){
-    if(numero[i] != null){
-      if(numero[i].id == toRemove){
-        delete numero[i];
-      }
-    }
-  }
-  localStorage.setItem('conteudo', JSON.stringify(numero));
-}
-*/
-
 function Poste(props){
   var heyyou = [];
   heyyou.push(
@@ -43,8 +29,82 @@ function Poste(props){
       </button>
     </div>
   );
-  
   return(heyyou);
+}
+
+/*
+  {
+    "id" : 2,
+    "title" : "bonjour, monde!",
+    "content" : "Maçã",
+    "slug" : "bonjour-monde"
+  },
+*/
+
+const formValid = formErrors =>{
+
+  console.log('hi!');
+  console.log(Object.values);
+
+  let valid = true;
+
+  Object.values(formErrors).forEach(val => val.length > 0 && (valid = false));
+  return valid;
+}
+
+class Formulario extends React.Component {
+  constructor(props){
+    super(props);
+
+    this.state = {
+      id:null,
+      title: null,
+      content: null,
+      slug: null,
+      aprove: true
+    }
+  }
+
+  handleSubmit = e =>{
+    e.preventDefault();
+
+    //console.log(this.state.title);
+    console.log(this);
+  }
+
+  render(){
+    return(
+      <div id="formulario" >
+        <form onSubmit={this.handleSubmit} noValidate>
+          <div className="title">
+            <label htmlFor="title">Greeting: </label>
+            <input 
+              type="text" 
+              className="titleInput" 
+              placeholder="First title" 
+              name="title"
+              value={this.state.title}
+              noValidate
+            />
+          </div>
+          <div className="content">
+            <label htmlFor="content">Greeting: </label>
+            <input 
+              type="text" 
+              className="contentInput" 
+              placeholder="word content" 
+              name="content"
+              value={this.state.content}
+              noValidate
+            />
+          </div>
+          <div className="createEntry">
+            <button type="submit">Ok!</button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 }
 
   class PostList extends React.Component {
@@ -115,6 +175,9 @@ function Poste(props){
       return (
         <div className='App'>
           <h1>Hellos</h1>
+          <Formulario
+
+          />
           <PostList
             cat={dados}
             onClick={(i) => this.deleteItem(i)}
