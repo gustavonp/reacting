@@ -8,7 +8,7 @@ import './index.css';
 //DONE -- puxar as funções para fora da class App
 //DONE -- fazer update na tela
 //DONE -- criar um form para dar Add
-// --  dar Add
+//DONE --  dar Add
 //Tentar deixar mais dry
 
 //Começar a planejar o hate-game
@@ -42,105 +42,18 @@ function Poste(props){
   },
 */
 
-/*
-class Formulario extends React.Component {
-  constructor(props){
-    super(props);
-
-    this.state = {
-      id:null,
-      title: null,
-      content: null,
-      slug: null,
-      aprove: true
+  class PostList extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        title: '',
+        content: ''
+      };
+  
+      this.handleChange = this.handleChange.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-
-  handleChange(event){
-    this.setState({title: event.target.title, content: event.target.content})
-  }
-
-  handleSubmit(event){
-    event.preventDefault();
-
-    console.log(this.state.content);
-    //console.log(this);
-  }
-
-  render(){
-    return(
-      <div id="formulario" >
-        <form onSubmit={this.handleSubmit} noValidate>
-          <div className="title">
-            <label htmlFor="title">Greeting: </label>
-            <input 
-              type="text" 
-              value={this.state.title}
-              onChange={this.handleChange}
-              className="titleInput" 
-              placeholder="First title" 
-              name="title"
-            />
-          </div>
-          <div className="content">
-            <label htmlFor="content">text here: </label>
-            <input 
-              type="text" 
-              value={this.state.content}
-              onChange={this.handleChange}
-              className="contentInput" 
-              placeholder="word content" 
-              name="content"
-            />
-          </div>
-          <div className="createEntry">
-            <button type="submit">Ok!</button>
-          </div>
-        </form>
-      </div>
-    );
-  }
-}
-*/
-
-class NameForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {value: ''};
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleChange(event) {
-    this.setState({value: event.target.value});
-  }
-
-  handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.value);
-    event.preventDefault();
-  }
-
-  render() {
-    return (
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          Name:
-          <input type="text" value={this.state.value} onChange={this.handleChange} />
-        </label>
-        <input type="submit" value="Submit" />
-      </form>
-    );
-  }
-}
-
-
-
-  class PostList extends React.Component {
     renderItem(item){
       return(
         <Poste
@@ -150,6 +63,8 @@ class NameForm extends React.Component {
           key={item.id}
         />);
     }
+
+    
 
     renderPost(){
       var cat = JSON.parse(localStorage.getItem('conteudo'));
@@ -169,6 +84,15 @@ class NameForm extends React.Component {
     }
 
 
+    handleChange(event) {
+      if(event.target.name == 'title'){
+        this.setState({title: event.target.value});
+      }
+      if(event.target.name == 'content'){
+        this.setState({content: event.target.value});
+      }
+    }
+
     addDB(newObj){
       let numero = JSON.parse(localStorage.getItem('conteudo'));
       numero.push(newObj);
@@ -185,14 +109,53 @@ class NameForm extends React.Component {
         }
       }
       localStorage.setItem('conteudo', JSON.stringify(numero));
-      this.setState(this.renderPost()
+      this.setState(this.renderPost());
+    }
 
-      );
+    nextID(){
+      let alldb = JSON.parse(localStorage.getItem('conteudo'));
+      return(alldb[alldb.length-1].id +1);
+    }
+
+    handleSubmit(event) {
+      var slugged = this.state.title.replace(" ", "-");     
+      var newid = this.nextID();
+      var newitem = {
+        id: newid,
+        title: this.state.title,
+        content: this.state.content,
+        slug: slugged
+      };
+  
+      this.addDB(newitem);
+      this.setState(this.renderPost());
+  
+      event.preventDefault();
+    }
+
+    renderForm(){
+        return (
+          <form onSubmit={this.handleSubmit}>
+            <label>
+              Name:
+              <input type="text"  name="title" value={this.state.value} onChange={this.handleChange} />
+            </label>
+    
+            <label>
+              Name:
+              <input type="text" name="content" value={this.state.value} onChange={this.handleChange} />
+            </label>
+            <input type="submit" value="Submit" />
+          </form>
+        );
     }
 
     render(){
       return(
         <div>
+          <div className='form'>
+            {this.renderForm()}
+          </div>
           {this.renderPost()}
         </div>
       )
@@ -208,9 +171,6 @@ class NameForm extends React.Component {
       return (
         <div className='App'>
           <h1>Hellos</h1>
-          <NameForm
-
-          />
           <PostList
             cat={dados}
             onClick={(i) => this.deleteItem(i)}
