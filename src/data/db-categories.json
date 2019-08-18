@@ -1,0 +1,26 @@
+[
+  {
+    "id" : 0,
+    "category" : "Olfato"
+  },
+  {
+    "id" : 1,
+    "category" : "Paladar"
+  },
+  {
+    "id" : 2,
+    "category" : "Visão"
+  },
+  {
+    "id" : 3,
+    "category" : "Audição"
+  },
+  {
+    "id" : 4,
+    "category" : "Tato"
+  },
+  {
+    "id" : 5,
+    "category" : "Mental"
+  }
+]

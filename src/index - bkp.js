@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import PostScenarios from './data/db-scenarios.json'
-import PostCategories from './data/db-categories.json'
+import PostData from './data/db-scenarios.json'
+import PostData from './data/db-categories.json'
 import './index.css';
 
 //DONE Criar DBs
-//DONE puxar infos
-//DONE randomizar
-//DONE puxar 2
+// puxar infos
+// randomizar
+// puxar 2
 // trocar o não escolhido
 // salvar as votações
 // se o match já foi, trocar
@@ -16,92 +16,13 @@ import './index.css';
 // se todas as possibilidades com o "mais odiado" acabar, trocar os dois
 // se todasas possibilidadex esgorarem, terminar o jogo
 
+
 function createDB(){
   localStorage.clear();
-  var objs = PostScenarios;
-  var objc = PostCategories;
-  var myData = []
-  myData[0] = JSON.stringify(objs);
-  myData[1] = JSON.stringify(objc);
-  localStorage.setItem('scenarios', myData[0]);
-  localStorage.setItem('categories', myData[1]);
+  var obj = PostData;
+  var myData = JSON.stringify(obj);
+  localStorage.setItem('conteudo', myData);
 }
-
-function shuffle (array) {
-  var i = 0
-    , j = 0
-    , temp = null
-
-  for (i = array.length - 1; i > 0; i -= 1) {
-    j = Math.floor(Math.random() * (i + 1))
-    temp = array[i]
-    array[i] = array[j]
-    array[j] = temp
-  }
-}
-
-class App extends React.Component{
-
-  render() {
-    createDB();
-    var dados = [];
-    dados[0] = JSON.parse(localStorage.getItem('scenarios'));
-    dados[1] = JSON.parse(localStorage.getItem('categories'));
-
-    return (
-      <div className='App'>
-        <h1>Infuri<i>rating</i></h1>
-        <MainProgram
-        //  scenarios={dados[0]}
-        //  categories={dados[1]}
-        />
-      </div>
-    );
-  }
-}
-
-class MainProgram extends React.Component{
-  constructor(props){
-    super(props);
-    this.state = {
-      matches: [],
-      votes: [],
-      chosen: null,
-    }
-  }
-
-  renderOptions(){
-
-    var scenarios = JSON.parse(localStorage.getItem('scenarios'));
-    shuffle(scenarios);
-    console.log(scenarios[0].scenario);
-
-    
-    return(
-      <div className='Scenarios'>
-        <div className='caseA'>
-        {scenarios[0].scenario}
-        </div>
-        <div className='or'>OR</div>
-        <div className='caseB'>
-        {scenarios[1].scenario}
-        </div>
-      </div>
-    );
-  }
-
-  render(){
-    return(
-      <div className='MainProgram'>
-        <p>Which one is the worst?</p>
-        <center>
-          {this.renderOptions()}
-        </center>
-      </div>
-    );
-  }
-}
-
 
 function Poste(props){
   var heyyou = [];
@@ -115,6 +36,15 @@ function Poste(props){
   );
   return(heyyou);
 }
+
+/*
+  {
+    "id" : 2,
+    "title" : "bonjour, monde!",
+    "content" : "Maçã",
+    "slug" : "bonjour-monde"
+  },
+*/
 
   class PostList extends React.Component {
     constructor(props) {
@@ -138,6 +68,8 @@ function Poste(props){
         />);
     }
 
+    
+
     renderPost(){
       var cat = JSON.parse(localStorage.getItem('conteudo'));
       return(
@@ -154,6 +86,7 @@ function Poste(props){
         </div>
       );
     }
+
 
     handleChange(event) {
       if(event.target.name == 'title'){
@@ -233,7 +166,23 @@ function Poste(props){
     }
   }
   
+  class App extends React.Component {
 
+    render() {
+      createDB();
+      var dados = JSON.parse(localStorage.getItem('conteudo'));
+        
+      return (
+        <div className='App'>
+          <h1>Hellos</h1>
+          <PostList
+            cat={dados}
+            onClick={(i) => this.deleteItem(i)}
+          />    
+        </div>
+      );
+    }
+  }
   
   // ========================================
   
