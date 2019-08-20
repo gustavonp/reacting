@@ -67,35 +67,53 @@ class MainProgram extends React.Component{
       matches: [],
       votes: [],
       chosen: null,
+      turns: 0
     }
   }
 
-  renderOptions(){
+  handleClick(choice, replace){
+    let scenes = JSON.parse(localStorage.getItem('scenarios'));
+    this.state.chosen = choice;
+    this.state.turns++;
+    this.state.matches.push([choice, replace])
 
-    var scenarios = JSON.parse(localStorage.getItem('scenarios'));
-    shuffle(scenarios);
-    console.log(scenarios[0].scenario);
+    console.log(choice + ' foi escolhido');
+    console.log(replace + ' foi trocado');
 
+    //manter o choice
+    //trocar o replace
+
+
+  }
+
+  renderOptions(scenarioOne, scenarioTwo){
     
     return(
       <div className='Scenarios'>
         <div className='caseA'>
-        {scenarios[0].scenario}
+  
+          <button id="optionA" type="button" value={scenarioOne.id} onClick={() => this.handleClick(scenarioOne.id, scenarioTwo.id)}>{scenarioOne.scenario} </button>
+        
         </div>
         <div className='or'>OR</div>
         <div className='caseB'>
-        {scenarios[1].scenario}
+
+          <button id="optionB" type="button" value={scenarioTwo.id} onClick={() => this.handleClick(scenarioTwo.id, scenarioOne.id)}>{scenarioTwo.scenario} </button>
+        
         </div>
       </div>
     );
   }
 
   render(){
+    var scenarios = JSON.parse(localStorage.getItem('scenarios'));
+    shuffle(scenarios);
+
     return(
       <div className='MainProgram'>
         <p>Which one is the worst?</p>
         <center>
-          {this.renderOptions()}
+          {this.renderOptions(scenarios[0], scenarios[1])}
         </center>
       </div>
     );
