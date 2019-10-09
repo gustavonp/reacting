@@ -40,6 +40,32 @@ function shuffle (array) {
   }
 }
 
+function reshuffle (choice, replace, pressed){
+
+  //ver pq não está trocando os dois botões
+
+  console.log('entrei');  
+  
+  var toTrade = ((pressed.id == 'optionA') ? "optionB" : "optionA");
+  var scenarios = JSON.parse(localStorage.getItem('scenarios'));
+  shuffle(scenarios);
+
+  var x = 0
+  for(x = 0; x < scenarios.length; x++){
+    if(scenarios[x].id != choice && scenarios[x].id != replace){
+      
+    //  console.log(scenarios[x]);
+    //  console.log(document.getElementById(toTrade));
+      
+      document.getElementById(toTrade).value = scenarios[x].id;
+      document.getElementById(toTrade).innerHTML = scenarios[x].scenario;
+      document.getElementById(toTrade).id = document.getElementById(toTrade).id;
+      
+      break;
+    }
+  }
+}
+
 class App extends React.Component{
 
   render() {
@@ -77,11 +103,14 @@ class MainProgram extends React.Component{
     this.state.turns++;
     this.state.matches.push([choice, replace])
 
-    console.log(choice + ' foi escolhido');
-    console.log(replace + ' foi trocado');
+    console.log(document.getElementById('optionA'));    
+    console.log(document.getElementById('optionB'));    
 
-    //manter o choice
-    //trocar o replace
+    if(document.getElementById('optionA').value == choice){
+      reshuffle(choice, replace, document.getElementById('optionA'));
+    }else if(document.getElementById('optionB').value == choice){
+      reshuffle(choice, replace, document.getElementById('optionB'));
+    }
 
 
   }
@@ -133,6 +162,9 @@ function Poste(props){
   );
   return(heyyou);
 }
+
+
+/*
 
   class PostList extends React.Component {
     constructor(props) {
@@ -250,6 +282,7 @@ function Poste(props){
       )
     }
   }
+  */
   
 
   
