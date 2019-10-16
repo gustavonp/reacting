@@ -43,27 +43,46 @@ function shuffle (array) {
 function reshuffle (choice, replace, pressed){
 
   //ver pq não está trocando os dois botões
-
-  console.log('entrei');  
-  
   var toTrade = ((pressed.id == 'optionA') ? "optionB" : "optionA");
   var scenarios = JSON.parse(localStorage.getItem('scenarios'));
   shuffle(scenarios);
 
+  console.log(choice);  
+  console.log(replace);  
+  console.log(pressed);  
+
+  console.log('entrei');  
+  
+  var newScenarioOne = [];
+  newScenarioOne['id'] = choice;
+  newScenarioOne['scenario'] = pressed.innerHTML;
+
+
   var x = 0
   for(x = 0; x < scenarios.length; x++){
     if(scenarios[x].id != choice && scenarios[x].id != replace){
+     
+      var newScenarioTwo = [];
+      newScenarioTwo['id'] = scenarios[x].id;
+      newScenarioTwo['scenario'] = scenarios[x].scenario;
+
       
-    //  console.log(scenarios[x]);
     //  console.log(document.getElementById(toTrade));
       
-      document.getElementById(toTrade).value = scenarios[x].id;
-      document.getElementById(toTrade).innerHTML = scenarios[x].scenario;
-      document.getElementById(toTrade).id = document.getElementById(toTrade).id;
-      
+    //  App.renderOptions(newScenarioOne, newScenarioTwo);
+    document.getElementById(toTrade).value = scenarios[x].id;
+    document.getElementById(toTrade).innerHTML = scenarios[x].scenario;
+    document.getElementById(toTrade).id = document.getElementById(toTrade).id;
+    /*
+      */  
+
       break;
     }
+
+  //  localStorage.setItem('scenarios', JSON.stringify(scenarios));
   }
+
+  return [newScenarioOne, newScenarioTwo];
 }
 
 class App extends React.Component{
@@ -103,31 +122,55 @@ class MainProgram extends React.Component{
     this.state.turns++;
     this.state.matches.push([choice, replace])
 
-    console.log(document.getElementById('optionA'));    
-    console.log(document.getElementById('optionB'));    
+    /*
+    */
+    console.log('choice = ' + choice);
+    console.log('A = ' + document.getElementById('optionA').value);
+    console.log('B = ' + document.getElementById('optionB').value);
 
+
+
+  var took = [];
     if(document.getElementById('optionA').value == choice){
-      reshuffle(choice, replace, document.getElementById('optionA'));
-    }else if(document.getElementById('optionB').value == choice){
-      reshuffle(choice, replace, document.getElementById('optionB'));
+      took = reshuffle(choice, replace, document.getElementById('optionA'));
+  //  }else if(document.getElementById('optionB').value == choice){
+    }else{
+      took = reshuffle(choice, replace, document.getElementById('optionB'));
     }
+
+    console.log(took[0]);
+
+    var thing1 = 
+    {
+      id: parseInt(took[0]['id']),
+      scenario: took[0]['scenario']
+    };
+
+    var thing2 = 
+    {
+      id: parseInt(took[1]['id']),
+      scenario: took[1]['scenario']
+    };
+
+    this.renderOptions(thing1, thing2);
+    // localStorage.setItem('scenarios', JSON.stringify(scenarios));
 
 
   }
 
   renderOptions(scenarioOne, scenarioTwo){
-    
+
     return(
       <div className='Scenarios'>
         <div className='caseA'>
   
-          <button id="optionA" type="button" value={scenarioOne.id} onClick={() => this.handleClick(scenarioOne.id, scenarioTwo.id)}>{scenarioOne.scenario} </button>
+          <button id="optionA" type="button" value={scenarioOne.id} onClick={() => this.handleClick(scenarioOne.id, scenarioTwo.id)}>{scenarioOne.scenario}</button>
         
         </div>
         <div className='or'>OR</div>
         <div className='caseB'>
 
-          <button id="optionB" type="button" value={scenarioTwo.id} onClick={() => this.handleClick(scenarioTwo.id, scenarioOne.id)}>{scenarioTwo.scenario} </button>
+          <button id="optionB" type="button" value={scenarioTwo.id} onClick={() => this.handleClick(scenarioTwo.id, scenarioOne.id)}>{scenarioTwo.scenario}</button>
         
         </div>
       </div>
@@ -149,7 +192,7 @@ class MainProgram extends React.Component{
   }
 }
 
-
+/*
 function Poste(props){
   var heyyou = [];
   heyyou.push(
@@ -162,7 +205,7 @@ function Poste(props){
   );
   return(heyyou);
 }
-
+*/
 
 /*
 
