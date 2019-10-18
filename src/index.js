@@ -1,8 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import PostScenarios from './data/db-scenarios.json'
-import PostCategories from './data/db-categories.json'
-import './index.css';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+// Dependencies
+import LocalStorageDatabase from "./services/database";
+
+// Components
+import MainProgram from './MainProgram';
 
 //DONE Criar DBs
 //DONE puxar infos
@@ -16,181 +20,48 @@ import './index.css';
 // se todas as possibilidades com o "mais odiado" acabar, trocar os dois
 // se todasas possibilidadex esgorarem, terminar o jogo
 
-function createDB(){
-  localStorage.clear();
-  var objs = PostScenarios;
-  var objc = PostCategories;
-  var myData = []
-  myData[0] = JSON.stringify(objs);
-  myData[1] = JSON.stringify(objc);
-  localStorage.setItem('scenarios', myData[0]);
-  localStorage.setItem('categories', myData[1]);
-}
+/**
+ * Main application
+ */
+class App extends React.Component {
+  database;
 
-function shuffle (array) {
-  var i = 0
-    , j = 0
-    , temp = null
+  isDatabaseInitialized = false;
 
-  for (i = array.length - 1; i > 0; i -= 1) {
-    j = Math.floor(Math.random() * (i + 1))
-    temp = array[i]
-    array[i] = array[j]
-    array[j] = temp
+  constructor() {
+    super();
+    this.database = new LocalStorageDatabase();
+    this.isDatabaseInitialized = this.database.initialize();
   }
-}
-
-function reshuffle (choice, replace, pressed){
-
-  //ver pq não está trocando os dois botões
-  var toTrade = ((pressed.id == 'optionA') ? "optionB" : "optionA");
-  var scenarios = JSON.parse(localStorage.getItem('scenarios'));
-  shuffle(scenarios);
-
-  console.log(choice);  
-  console.log(replace);  
-  console.log(pressed);  
-
-  console.log('entrei');  
-  
-  var newScenarioOne = [];
-  newScenarioOne['id'] = choice;
-  newScenarioOne['scenario'] = pressed.innerHTML;
-
-
-  var x = 0
-  for(x = 0; x < scenarios.length; x++){
-    if(scenarios[x].id != choice && scenarios[x].id != replace){
-     
-      var newScenarioTwo = [];
-      newScenarioTwo['id'] = scenarios[x].id;
-      newScenarioTwo['scenario'] = scenarios[x].scenario;
-
-      
-    //  console.log(document.getElementById(toTrade));
-      
-    //  App.renderOptions(newScenarioOne, newScenarioTwo);
-    document.getElementById(toTrade).value = scenarios[x].id;
-    document.getElementById(toTrade).innerHTML = scenarios[x].scenario;
-    document.getElementById(toTrade).id = document.getElementById(toTrade).id;
-    /*
-      */  
-
-      break;
-    }
-
-  //  localStorage.setItem('scenarios', JSON.stringify(scenarios));
-  }
-
-  return [newScenarioOne, newScenarioTwo];
-}
-
-class App extends React.Component{
 
   render() {
-    createDB();
-    var dados = [];
-    dados[0] = JSON.parse(localStorage.getItem('scenarios'));
-    dados[1] = JSON.parse(localStorage.getItem('categories'));
-
-    return (
-      <div className='App'>
-        <h1>Infuri<i>rating</i></h1>
-        <MainProgram
-        //  scenarios={dados[0]}
-        //  categories={dados[1]}
-        />
-      </div>
-    );
+    if (this.isDatabaseInitialized) {
+      // var dados = [];
+      // dados[0] = JSON.parse(localStorage.getItem('scenarios'));
+      // dados[1] = JSON.parse(localStorage.getItem('categories'));
+      return (
+        <div className="App">
+          <h1>
+            Infuri<i>rating</i>
+          </h1>
+          <MainProgram
+          //  scenarios={dados[0]}
+          //  categories={dados[1]}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <h1>
+          We are experiencing a problem, and that's very irritating. Come back
+          later!
+        </h1>
+      );
+    }
   }
 }
 
-class MainProgram extends React.Component{
-  constructor(props){
-    super(props);
-    this.state = {
-      matches: [],
-      votes: [],
-      chosen: null,
-      turns: 0
-    }
-  }
 
-  handleClick(choice, replace){
-    let scenes = JSON.parse(localStorage.getItem('scenarios'));
-    this.state.chosen = choice;
-    this.state.turns++;
-    this.state.matches.push([choice, replace])
-
-    /*
-    */
-    console.log('choice = ' + choice);
-    console.log('A = ' + document.getElementById('optionA').value);
-    console.log('B = ' + document.getElementById('optionB').value);
-
-
-
-  var took = [];
-    if(document.getElementById('optionA').value == choice){
-      took = reshuffle(choice, replace, document.getElementById('optionA'));
-  //  }else if(document.getElementById('optionB').value == choice){
-    }else{
-      took = reshuffle(choice, replace, document.getElementById('optionB'));
-    }
-
-    console.log(took[0]);
-
-    var thing1 = 
-    {
-      id: parseInt(took[0]['id']),
-      scenario: took[0]['scenario']
-    };
-
-    var thing2 = 
-    {
-      id: parseInt(took[1]['id']),
-      scenario: took[1]['scenario']
-    };
-
-    this.renderOptions(thing1, thing2);
-    // localStorage.setItem('scenarios', JSON.stringify(scenarios));
-
-
-  }
-
-  renderOptions(scenarioOne, scenarioTwo){
-
-    return(
-      <div className='Scenarios'>
-        <div className='caseA'>
-  
-          <button id="optionA" type="button" value={scenarioOne.id} onClick={() => this.handleClick(scenarioOne.id, scenarioTwo.id)}>{scenarioOne.scenario}</button>
-        
-        </div>
-        <div className='or'>OR</div>
-        <div className='caseB'>
-
-          <button id="optionB" type="button" value={scenarioTwo.id} onClick={() => this.handleClick(scenarioTwo.id, scenarioOne.id)}>{scenarioTwo.scenario}</button>
-        
-        </div>
-      </div>
-    );
-  }
-
-  render(){
-    var scenarios = JSON.parse(localStorage.getItem('scenarios'));
-    shuffle(scenarios);
-
-    return(
-      <div className='MainProgram'>
-        <p>Which one is the worst?</p>
-        <center>
-          {this.renderOptions(scenarios[0], scenarios[1])}
-        </center>
-      </div>
-    );
-  }
-}
 
 /*
 function Poste(props){
@@ -326,12 +197,7 @@ function Poste(props){
     }
   }
   */
-  
 
-  
-  // ========================================
-  
-  ReactDOM.render(
-    <App />,
-    document.getElementById('root')
-  );
+// ========================================
+
+ReactDOM.render(<App />, document.getElementById("root"));
