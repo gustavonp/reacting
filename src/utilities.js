@@ -1,4 +1,8 @@
-export function shuffle (array) {
+/**
+ * Grab the whole database and shuffle it
+ * @param {array} array all atabase
+ */
+export function shuffleScenarios (array) {
   var i = 0
     , j = 0
     , temp = null
@@ -11,49 +15,52 @@ export function shuffle (array) {
   }
 }
 
-
-
-
-export function reshuffle (choice, replace, pressed){
-
-  //ver pq não está trocando os dois botões
-  var toTrade = ((pressed.id == 'optionA') ? "optionB" : "optionA");
-  var scenarios = JSON.parse(localStorage.getItem('scenarios'));
-  shuffle(scenarios);
-
-  console.log(choice);  
-  console.log(replace);  
-  console.log(pressed);  
-
-  console.log('entrei');  
+/**
+ * reshuffleScenarios
+ * @param {num} chosenOption selected button's ID
+ * @param {num} optionToReplace button ID to be replaced
+ * @param {obj} pressedButton pressedButton button
+ */
+export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton){
+  var toTrade = ((pressedButton.id === 'optionA') ? 'optionB' : 'optionA');
+  var allScenarios = JSON.parse(localStorage.getItem('scenarios')); 
   
-  var newScenarioOne = [];
-  newScenarioOne['id'] = choice;
-  newScenarioOne['scenario'] = pressed.innerHTML;
+  var newScenarioOne = {
+      id: null,
+      scenario: ''
+  },
+      newScenarioTwo = {
+      id: null,
+      scenario: ''
+  };
 
+  var x = 0;
+  var fetchNewScenario = {
+    id: null,
+    scenario: ''
+  };
+  for(x = 0; x < allScenarios.length; x++){
+    if(allScenarios[x].id != chosenOption && allScenarios[x].id != optionToReplace){
 
-  var x = 0
-  for(x = 0; x < scenarios.length; x++){
-    if(scenarios[x].id != choice && scenarios[x].id != replace){
-     
-      var newScenarioTwo = [];
-      newScenarioTwo['id'] = scenarios[x].id;
-      newScenarioTwo['scenario'] = scenarios[x].scenario;
-
-      
-    //  console.log(document.getElementById(toTrade));
-      
-    //  App.renderOptions(newScenarioOne, newScenarioTwo);
-    document.getElementById(toTrade).value = scenarios[x].id;
-    document.getElementById(toTrade).innerHTML = scenarios[x].scenario;
-    document.getElementById(toTrade).id = document.getElementById(toTrade).id;
-    /*
-      */  
+      fetchNewScenario.id = allScenarios[x].id;
+      fetchNewScenario.scenario = allScenarios[x].scenario;
 
       break;
     }
+  }
 
-  //  localStorage.setItem('scenarios', JSON.stringify(scenarios));
+  if(toTrade === 'optionA'){
+    newScenarioTwo.id = chosenOption;
+    newScenarioTwo.scenario = pressedButton.innerHTML;
+
+    newScenarioOne.id = fetchNewScenario.id;
+    newScenarioOne.scenario = fetchNewScenario.scenario;
+  }else{
+    newScenarioOne.id = chosenOption;
+    newScenarioOne.scenario = pressedButton.innerHTML;
+
+    newScenarioTwo.id = fetchNewScenario.id;
+    newScenarioTwo.scenario = fetchNewScenario.scenario;
   }
 
   return [newScenarioOne, newScenarioTwo];

@@ -1,9 +1,9 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
 
 // Dependencies
-import LocalStorageDatabase from "./services/database";
+import LocalStorageDatabase from './services/database';
 
 // Components
 import MainProgram from './MainProgram';
@@ -65,4 +65,4 @@ class App extends React.Component {
 /** 
  * Starting the game
  */
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById('root'));
