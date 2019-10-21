@@ -12,9 +12,9 @@ import MainProgram from './MainProgram';
 //DONE puxar infos
 //DONE randomizar
 //DONE puxar 2
+//DONE Guardar as votações
+//DONE se o match já foi, trocar
 // trocar o não escolhido
-// salvar as votações
-// se o match já foi, trocar
 // criar botão de parar
 // mostrar todos os votos
 // se todas as possibilidades com o "mais odiado" acabar, trocar os dois
