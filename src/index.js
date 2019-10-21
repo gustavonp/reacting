@@ -24,18 +24,48 @@ import MainProgram from './MainProgram';
  * Main application
  */
 class App extends React.Component {
+  /*
+  constructor(props) {
+    super(props);
+    this.state = {
+      matches: [],
+      votes: [],
+      chosen: null,
+      turns: 0
+    };
+  }
+  */
   database;
 
   isDatabaseInitialized = false;
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.database = new LocalStorageDatabase();
     this.isDatabaseInitialized = this.database.initialize();
+
+    /*
+    this.state = {
+      matches: [],
+      votes: [],
+      chosen: null,
+      turns: 0
+    };
+    */
+   
   }
 
   render() {
     if (this.isDatabaseInitialized) {
+
+      var dataControl = {
+        matches: [],
+        votes: [],
+        chosen: null,
+        turns: 0
+      };
+      /*
+      */
       // var dados = [];
       // dados[0] = JSON.parse(localStorage.getItem('scenarios'));
       // dados[1] = JSON.parse(localStorage.getItem('categories'));
@@ -45,6 +75,7 @@ class App extends React.Component {
             Infuri<i>rating</i>
           </h1>
           <MainProgram
+            dataControl={dataControl}
           //  scenarios={dados[0]}
           //  categories={dados[1]}
           />

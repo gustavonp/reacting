@@ -21,7 +21,8 @@ export function shuffleScenarios (array) {
  * @param {num} optionToReplace button ID to be replaced
  * @param {obj} pressedButton pressedButton button
  */
-export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton){
+export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton, matchedScenarios){
+
   var toTrade = ((pressedButton.id === 'optionA') ? 'optionB' : 'optionA');
   var allScenarios = JSON.parse(localStorage.getItem('scenarios')); 
   
@@ -41,11 +42,12 @@ export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton
   };
   for(x = 0; x < allScenarios.length; x++){
     if(allScenarios[x].id != chosenOption && allScenarios[x].id != optionToReplace){
+      if(validateComparison(chosenOption, allScenarios[x].id, matchedScenarios)){
+        fetchNewScenario.id = allScenarios[x].id;
+        fetchNewScenario.scenario = allScenarios[x].scenario;
 
-      fetchNewScenario.id = allScenarios[x].id;
-      fetchNewScenario.scenario = allScenarios[x].scenario;
-
-      break;
+        break;
+      }
     }
   }
 
@@ -64,4 +66,20 @@ export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton
   }
 
   return [newScenarioOne, newScenarioTwo];
+}
+
+function validateComparison(chosenOption, newMatch, oldMatches){
+  var x = oldMatches.length;
+
+  var arrTemp = [];
+  arrTemp.push([chosenOption, newMatch]);
+  arrTemp.push([newMatch, chosenOption]);
+
+  for(var i = 0; i < x; i++){
+    if(arrTemp[0].join('') == oldMatches[i].join('') || arrTemp[1].join('') == oldMatches[i].join('')){
+      return false;
+    }
+  }
+
+  return true;
 }
