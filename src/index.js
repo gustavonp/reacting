@@ -66,8 +66,6 @@ class App extends React.Component {
             Infuri<i>rating</i>
           </h1>
           <MainProgram
-            dataControl={this.state}
-
           // DN: Remove unused code
           //  scenarios={dados[0]}
           //  categories={dados[1]}
