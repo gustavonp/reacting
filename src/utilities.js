@@ -69,15 +69,10 @@ export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton
 }
 
 function validateComparison(chosenOption, newMatch, oldMatches){
+  
   var x = oldMatches.length;
-
-  var arrTemp = [];
-  arrTemp.push([chosenOption, newMatch]);
-  arrTemp.push([newMatch, chosenOption]);
-
-  //check if two values exist on new array instead of comparing new arrays.
   for(var i = 0; i < x; i++){
-    if(arrTemp[0].join('') == oldMatches[i].join('') || arrTemp[1].join('') == oldMatches[i].join('')){
+    if(oldMatches[i].includes(chosenOption) && oldMatches[i].includes(newMatch)){
       return false;
     }
   }
