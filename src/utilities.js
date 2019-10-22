@@ -75,6 +75,7 @@ function validateComparison(chosenOption, newMatch, oldMatches){
   arrTemp.push([chosenOption, newMatch]);
   arrTemp.push([newMatch, chosenOption]);
 
+  //check if two values exist on new array instead of comparing new arrays.
   for(var i = 0; i < x; i++){
     if(arrTemp[0].join('') == oldMatches[i].join('') || arrTemp[1].join('') == oldMatches[i].join('')){
       return false;

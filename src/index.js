@@ -8,22 +8,26 @@ import LocalStorageDatabase from './services/database';
 // Components
 import MainProgram from './MainProgram';
 
+/* DN: Move those items to GitHub Issues --> write them in English */
 //DONE Criar DBs
 //DONE puxar infos
 //DONE randomizar
 //DONE puxar 2
 //DONE Guardar as votações
 //DONE se o match já foi, trocar
-// trocar o não escolhido
+// trocar o não escolhido -- switch the dataControl updateon the Mainprogram class to setState and sent the "upcoming match" as a new state
 // criar botão de parar
 // mostrar todos os votos
 // se todas as possibilidades com o "mais odiado" acabar, trocar os dois
 // se todasas possibilidadex esgorarem, terminar o jogo
+/* =============================================================== */
 
 /**
  * Main application
  */
 class App extends React.Component {
+
+  // DN: Remove unused code
   /*
   constructor(props) {
     super(props);
@@ -35,35 +39,22 @@ class App extends React.Component {
     };
   }
   */
+
   database;
 
   isDatabaseInitialized = false;
 
   constructor(props) {
     super(props);
+    
     this.database = new LocalStorageDatabase();
-    this.isDatabaseInitialized = this.database.initialize();
-
-    /*
-    this.state = {
-      matches: [],
-      votes: [],
-      chosen: null,
-      turns: 0
-    };
-    */
-   
+    this.isDatabaseInitialized = this.database.initialize();   
   }
 
   render() {
     if (this.isDatabaseInitialized) {
 
-      var dataControl = {
-        matches: [],
-        votes: [],
-        chosen: null,
-        turns: 0
-      };
+      // DN: Remove unused code
       /*
       */
       // var dados = [];
@@ -75,7 +66,7 @@ class App extends React.Component {
             Infuri<i>rating</i>
           </h1>
           <MainProgram
-            dataControl={dataControl}
+          // DN: Remove unused code
           //  scenarios={dados[0]}
           //  categories={dados[1]}
           />

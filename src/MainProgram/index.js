@@ -5,28 +5,40 @@ import { shuffleScenarios, reshuffleScenarios } from '../utilities';
 
 export default class MainProgram extends React.Component {
 
+  constructor(props) {
+    super(props);
+
+    // Set the initial State of the App
+    this.state = {
+      matches: [],
+      votes: [],
+      chosen: null,
+      turns: 0
+    }
+  }
+
   handleClick(choice, replace) {
 
-    this.props.dataControl.matches.push([choice, replace]);
-    //this.props.dataControl.votes //Hold this for now.
-    this.props.dataControl.chosen = choice;
-    this.props.dataControl.turns++;
+    this.state.matches.push([choice, replace]);
+    //this.state.votes //Hold this for now.
+    this.state.chosen = choice;
+    this.state.turns++;
 
     /*
     console.log('- - Data Control - -');
-    console.log(this.props.dataControl.matches);
-    console.log(this.props.dataControl.votes);
-    console.log(this.props.dataControl.chosen);
-    console.log(this.props.dataControl.turns);
+    console.log(this.state.matches);
+    console.log(this.state.votes);
+    console.log(this.state.chosen);
+    console.log(this.state.turns);
     console.log('- - - - - - - - - - ');
     */
 
     var newScenarios = [];
     if (document.getElementById('optionA').value == choice) {
-      newScenarios = reshuffleScenarios(choice, replace, document.getElementById('optionA'), this.props.dataControl.matches);
+      newScenarios = reshuffleScenarios(choice, replace, document.getElementById('optionA'), this.state.matches);
       //  }else if(document.getElementById('optionB').value == choice){
     } else {
-      newScenarios = reshuffleScenarios(choice, replace, document.getElementById('optionB'), this.props.dataControl.matches);
+      newScenarios = reshuffleScenarios(choice, replace, document.getElementById('optionB'), this.state.matches);
     }
 
     //Find out why the code is entering twice on the renderOptions functions when it's being called with setState.
