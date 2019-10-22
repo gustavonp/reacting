@@ -8,6 +8,7 @@ import LocalStorageDatabase from './services/database';
 // Components
 import MainProgram from './MainProgram';
 
+/* DN: Move those items to GitHub Issues --> write them in English */
 //DONE Criar DBs
 //DONE puxar infos
 //DONE randomizar
@@ -19,11 +20,14 @@ import MainProgram from './MainProgram';
 // mostrar todos os votos
 // se todas as possibilidades com o "mais odiado" acabar, trocar os dois
 // se todasas possibilidadex esgorarem, terminar o jogo
+/* =============================================================== */
 
 /**
  * Main application
  */
 class App extends React.Component {
+
+  // DN: Remove unused code
   /*
   constructor(props) {
     super(props);
@@ -41,29 +45,24 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
+    
     this.database = new LocalStorageDatabase();
     this.isDatabaseInitialized = this.database.initialize();
 
-    /*
+    // Set the initial State of the App
     this.state = {
       matches: [],
       votes: [],
       chosen: null,
       turns: 0
     };
-    */
    
   }
 
   render() {
     if (this.isDatabaseInitialized) {
 
-      var dataControl = {
-        matches: [],
-        votes: [],
-        chosen: null,
-        turns: 0
-      };
+      // DN: Remove unused code
       /*
       */
       // var dados = [];
@@ -75,7 +74,9 @@ class App extends React.Component {
             Infuri<i>rating</i>
           </h1>
           <MainProgram
-            dataControl={dataControl}
+            dataControl={this.state}
+
+          // DN: Remove unused code
           //  scenarios={dados[0]}
           //  categories={dados[1]}
           />
