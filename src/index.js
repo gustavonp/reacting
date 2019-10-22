@@ -39,6 +39,7 @@ class App extends React.Component {
     };
   }
   */
+
   database;
 
   isDatabaseInitialized = false;
@@ -47,16 +48,7 @@ class App extends React.Component {
     super(props);
     
     this.database = new LocalStorageDatabase();
-    this.isDatabaseInitialized = this.database.initialize();
-
-    // Set the initial State of the App
-    this.state = {
-      matches: [],
-      votes: [],
-      chosen: null,
-      turns: 0
-    };
-   
+    this.isDatabaseInitialized = this.database.initialize();   
   }
 
   render() {
