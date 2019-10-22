@@ -15,7 +15,7 @@ import MainProgram from './MainProgram';
 //DONE puxar 2
 //DONE Guardar as votações
 //DONE se o match já foi, trocar
-// trocar o não escolhido
+// trocar o não escolhido -- switch the dataControl updateon the Mainprogram class to setState and sent the "upcoming match" as a new state
 // criar botão de parar
 // mostrar todos os votos
 // se todas as possibilidades com o "mais odiado" acabar, trocar os dois
