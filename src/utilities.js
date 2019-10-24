@@ -20,6 +20,7 @@ export function shuffleScenarios (array) {
  * @param {num} chosenOption selected button's ID
  * @param {num} optionToReplace button ID to be replaced
  * @param {obj} pressedButton pressedButton button
+ * @param {obj} matchedScenarios all previously matched scenarios
  */
 export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton, matchedScenarios){
 
@@ -50,6 +51,9 @@ export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton
       }
     }
   }
+  if(fetchNewScenario.id == null){
+    alert('There are no more matches');
+  }
 
   if(toTrade === 'optionA'){
     newScenarioTwo.id = chosenOption;
@@ -69,13 +73,11 @@ export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton
 }
 
 function validateComparison(chosenOption, newMatch, oldMatches){
-  
   var x = oldMatches.length;
   for(var i = 0; i < x; i++){
     if(oldMatches[i].includes(chosenOption) && oldMatches[i].includes(newMatch)){
       return false;
     }
   }
-
   return true;
 }

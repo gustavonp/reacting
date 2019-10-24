@@ -15,7 +15,7 @@ import MainProgram from './MainProgram';
 //DONE puxar 2
 //DONE Guardar as votações
 //DONE se o match já foi, trocar
-// trocar o não escolhido -- switch the dataControl updateon the Mainprogram class to setState and sent the "upcoming match" as a new state
+//DONE trocar o não escolhido
 // criar botão de parar
 // mostrar todos os votos
 // se todas as possibilidades com o "mais odiado" acabar, trocar os dois
@@ -26,19 +26,6 @@ import MainProgram from './MainProgram';
  * Main application
  */
 class App extends React.Component {
-
-  // DN: Remove unused code
-  /*
-  constructor(props) {
-    super(props);
-    this.state = {
-      matches: [],
-      votes: [],
-      chosen: null,
-      turns: 0
-    };
-  }
-  */
 
   database;
 
@@ -54,22 +41,12 @@ class App extends React.Component {
   render() {
     if (this.isDatabaseInitialized) {
 
-      // DN: Remove unused code
-      /*
-      */
-      // var dados = [];
-      // dados[0] = JSON.parse(localStorage.getItem('scenarios'));
-      // dados[1] = JSON.parse(localStorage.getItem('categories'));
       return (
         <div className="App">
           <h1>
             Infuri<i>rating</i>
           </h1>
-          <MainProgram
-          // DN: Remove unused code
-          //  scenarios={dados[0]}
-          //  categories={dados[1]}
-          />
+          <MainProgram/>
         </div>
       );
     } else {
@@ -82,7 +59,6 @@ class App extends React.Component {
     }
   }
 }
-
 
 /** 
  * Starting the game
