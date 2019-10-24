@@ -4,7 +4,6 @@ import PostCategories from '../data/db-categories.json';
 export default class LocalStorageDatabase {
 
   postScenarios;
-
   postCategories;
 
   constructor() {

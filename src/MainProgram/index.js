@@ -37,18 +37,13 @@ export default class MainProgram extends React.Component {
     return [x, y];
   }
 
-  handleClick(choice, replace) {
+  handleClick(choice, replace, chosenButton) {
 
     this.state.matches.push([choice, replace]);
     //this.state.votes //Hold this for now.
 
     var newScenarios = [];
-    if (document.getElementById('optionA').value == choice) {
-      newScenarios = reshuffleScenarios(choice, replace, document.getElementById('optionA'), this.state.matches);
-      //  }else if(document.getElementById('optionB').value == choice){
-    } else {
-      newScenarios = reshuffleScenarios(choice, replace, document.getElementById('optionB'), this.state.matches);
-    }
+    newScenarios = reshuffleScenarios(choice, replace, chosenButton, this.state.matches);
 
     this.setNextMatch(newScenarios[0], newScenarios[1]);
 
@@ -56,14 +51,6 @@ export default class MainProgram extends React.Component {
       chosen: choice,
       turns: this.state.turns++
     });
-
-    console.log('- - - -');
-    console.log(this.state.matches);
-    console.log(this.state.nextMatch);
-    console.log(this.state.votes);
-    console.log(this.state.chosen);
-    console.log(this.state.turns);
-    console.log('- - - -');
   }
 
   renderOptions(scenarioOne, scenarioTwo, myTeste = 0) {
@@ -74,7 +61,7 @@ export default class MainProgram extends React.Component {
             id="optionA"
             type="button"
             value={scenarioOne.id}
-            onClick={() => this.handleClick(scenarioOne.id, scenarioTwo.id)}
+            onClick={() => this.handleClick(scenarioOne.id, scenarioTwo.id, {id:'optionA', 'text':scenarioOne.scenario})}
           >
             {scenarioOne.scenario}
           </button>
@@ -85,9 +72,9 @@ export default class MainProgram extends React.Component {
             id="optionB"
             type="button"
             value={scenarioTwo.id}
-            onClick={() => this.handleClick(scenarioTwo.id, scenarioOne.id)}
+            onClick={() => this.handleClick(scenarioTwo.id, scenarioOne.id, {id:'optionB', 'text':scenarioTwo.scenario})}
           >
-            {scenarioTwo.scenario}
+          {scenarioTwo.scenario}
           </button>
         </div>
       </div>

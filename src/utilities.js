@@ -57,13 +57,13 @@ export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton
 
   if(toTrade === 'optionA'){
     newScenarioTwo.id = chosenOption;
-    newScenarioTwo.scenario = pressedButton.innerHTML;
+    newScenarioTwo.scenario = pressedButton.text;
 
     newScenarioOne.id = fetchNewScenario.id;
     newScenarioOne.scenario = fetchNewScenario.scenario;
   }else{
     newScenarioOne.id = chosenOption;
-    newScenarioOne.scenario = pressedButton.innerHTML;
+    newScenarioOne.scenario = pressedButton.text;
 
     newScenarioTwo.id = fetchNewScenario.id;
     newScenarioTwo.scenario = fetchNewScenario.scenario;
