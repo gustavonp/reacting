@@ -72,6 +72,7 @@ export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton
   return [newScenarioOne, newScenarioTwo];
 }
 
+// TODO: missing JSDocs
 function validateComparison(chosenOption, newMatch, oldMatches){
   var x = oldMatches.length;
   for(var i = 0; i < x; i++){
