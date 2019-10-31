@@ -24,6 +24,8 @@ export function shuffleScenarios (array) {
  */
 export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton, matchedScenarios){
 
+  //handleClick() content changed, need to refactor this function in order to work properly
+
   var toTrade = ((pressedButton.id === 'optionA') ? 'optionB' : 'optionA');
   var allScenarios = JSON.parse(localStorage.getItem('scenarios')); 
   
@@ -72,7 +74,12 @@ export function reshuffleScenarios (chosenOption, optionToReplace, pressedButton
   return [newScenarioOne, newScenarioTwo];
 }
 
-// TODO: missing JSDocs
+/** 
+ * validateComparison
+ * @param {obj} chosenOption voted scenario
+ * @param {obj} newMatch new selected match
+ * @param {obj} oldMatches all previous matches
+ */
 function validateComparison(chosenOption, newMatch, oldMatches){
   var x = oldMatches.length;
   for(var i = 0; i < x; i++){

@@ -10,18 +10,20 @@ export default class MainProgram extends React.Component {
     // Set the initial State of the App
     this.state = {
       matches: [],
-      nextMatch: [],
+      nextMatch: this.getFirstMatch(),
       votes: [],
       chosen: null,
       turns: 0
     }
   }
 
-  setNextMatch(firstChoice, secondChoice){
-    // TODO: Avoid changing state directly, you can return the next match as a new array
-    //       so you can choose WHEN to setState in other functions, to avoid multiple renders
-    this.state.nextMatch.length = 0;
-    this.state.nextMatch.push(firstChoice.id, secondChoice.id);
+  getFirstMatch(){
+    var scenarios = JSON.parse(localStorage.getItem('scenarios'));
+    shuffleScenarios(scenarios);     
+    return {
+      firstItem: scenarios[0],
+      secondItem: scenarios[1]
+    };
   }
 
   getNextMatch(){
@@ -29,34 +31,47 @@ export default class MainProgram extends React.Component {
     var x, y = null;
     
     for(var i = 0; i < scenarios.length; i++){
-      if(scenarios[i].id == this.state.nextMatch[0]){
+      if(scenarios[i].id == this.state.nextMatch.firstItem){
         x = scenarios[i];
       }
-      if(scenarios[i].id == this.state.nextMatch[1]){
+      if(scenarios[i].id == this.state.nextMatch.secondItem){
         y = scenarios[i];
       }
     }
     return [x, y];
   }
 
+  setNextMatch(firstChoice, secondChoice){
+    var newObject = {
+      firstItem: firstChoice,
+      secondItem: secondChoice
+    }
+    this.setState({
+      nextMatch: newObject
+    });
+  }
 
-  handleClick(choice, replace, chosenButton) {
-    // TODO: Avoid changing state directly,  use  var myNewArray = [...this.state.matches];  myNewArray.push([choice, replace]);
-    this.state.matches.push([choice, replace]);
-
+  handleClick(choice) {
     //this.state.votes //Hold this for now.
+
+    var chosenButton = (choice == this.state.nextMatch.firstItem.id) ? this.state.nextMatch.firstItem : this.state.nextMatch.secondItem;
+    var replace = (choice == this.state.nextMatch.firstItem.id) ? this.state.nextMatch.secondItem.id : this.state.nextMatch.firstItem.id;
 
     var newScenarios = [];
     /* TODO: You might need to refactor this function to accomodate the exclusion of "chosenButton" */
     newScenarios = reshuffleScenarios(choice, replace, chosenButton, this.state.matches);
 
-    /*
-      TODO: make this function return a brand new array, and set the match parameter on the setState below 
-            because you need the matches already set, you may need to set the state right in the beginning.
-    */
-    this.setNextMatch(newScenarios[0], newScenarios[1]);
+    var newMatch = this.state.matches;
+    newMatch.push([choice, replace]);
+
+    var newObject = {
+      firstItem: newScenarios[0].id,
+      secondItem: newScenarios[1].id
+    };
 
     this.setState({
+      matches: newMatch,
+      nextMatch: newObject,
       chosen: choice,
       turns: this.state.turns++
     });
@@ -65,26 +80,19 @@ export default class MainProgram extends React.Component {
   /* 
     TODO: on handleClick call:
 
-    - Remove scenarioOne.id, scenarioTwo.id params
-    - Remove third option as an object, and make it a simple param:
-      handleClick('optionA', scenarioOne.id)
-
-
     Since you are not interested in the Click Native Event, your onClick can be simplified to:
     - onClick={this.handleClick(......)}
 
-    If you need the browser native event one day, you can do as:
-    - onClick={(e) => this.handleClick(e, .......)}
+    G: ReactJS responded with an error when I removed the fat arrow
   */
-  renderOptions(scenarioOne, scenarioTwo, myTeste = 0) {
+  renderOptions(scenarioOne, scenarioTwo) {
     return (
       <div className="Scenarios">
         <div className="caseA">
           <button
-            id="optionA"
             type="button"
-            value={scenarioOne.id}
-            onClick={() => this.handleClick(scenarioOne.id, scenarioTwo.id, {id:'optionA', 'text':scenarioOne.scenario})}
+            id="optionA"
+            onClick={() => this.handleClick(scenarioOne.id)}
           >
             {scenarioOne.scenario}
           </button>
@@ -92,10 +100,9 @@ export default class MainProgram extends React.Component {
         <div className="or">OR</div>
         <div className="caseB">
           <button
-            id="optionB"
             type="button"
-            value={scenarioTwo.id}
-            onClick={() => this.handleClick(scenarioTwo.id, scenarioOne.id, {id:'optionB', 'text':scenarioTwo.scenario})}
+            id="optionB"
+            onClick={() => this.handleClick(scenarioTwo.id)}
           >
           {scenarioTwo.scenario}
           </button>
@@ -111,21 +118,28 @@ export default class MainProgram extends React.Component {
       instead, use the state to store your Current game state.
 
       If you need to calculate your nextMatch, you can also store in the state, no worries
+
+      G: This would make me add more information on this.state, instead of just two ints I also would have to save two strings.
+      Also, React is not letting me set any new state inside render(), how am I supposed to get a new one if this is the first turn?
     */
+
+/*
     var scenario = [];
-    if(this.state.nextMatch.length > 0){
+    if(this.state.nextMatch.firstItem != null){
+
       scenario = this.getNextMatch();
+
     }else{
+
       var scenarios = JSON.parse(localStorage.getItem('scenarios'));
-      shuffleScenarios(scenarios);
-      this.setNextMatch(scenarios[0], scenarios[1]);
+      shuffleScenarios(scenarios);     
       scenario.push(scenarios[0], scenarios[1]);
     }
-
+*/
     return (
       <div className="MainProgram">
         <p>Which one is the worst?</p>
-        <center>{this.renderOptions(scenario[0], scenario[1])}</center>
+        <center>{this.renderOptions(this.state.nextMatch.firstItem, this.state.nextMatch.secondItem)}</center>
       </div>
     );
   }
