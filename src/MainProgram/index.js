@@ -7,7 +7,6 @@ export default class MainProgram extends React.Component {
 
   constructor(props) {
     super(props);
-    // Set the initial State of the App
     this.state = {
       matches: [],
       nextMatch: this.getFirstMatch(),
@@ -54,19 +53,29 @@ export default class MainProgram extends React.Component {
   handleClick(choice) {
     //this.state.votes //Hold this for now.
 
-    var chosenButton = (choice == this.state.nextMatch.firstItem.id) ? this.state.nextMatch.firstItem : this.state.nextMatch.secondItem;
     var replace = (choice == this.state.nextMatch.firstItem.id) ? this.state.nextMatch.secondItem.id : this.state.nextMatch.firstItem.id;
+    var newScenario = reshuffleScenarios(choice, replace, this.state.matches);
 
-    var newScenarios = [];
-    /* TODO: You might need to refactor this function to accomodate the exclusion of "chosenButton" */
-    newScenarios = reshuffleScenarios(choice, replace, chosenButton, this.state.matches);
+    if(choice == this.state.nextMatch.firstItem.id){
+      var firstItem = this.state.nextMatch.firstItem;
+      var secondItem = {
+        id: newScenario.id,
+        scenario: newScenario.scenario
+      }
+    }else{
+      var secondItem = this.state.nextMatch.secondItem;
+      var firstItem = {
+        id: newScenario.id,
+        scenario: newScenario.scenario
+      }
+    }
 
     var newMatch = this.state.matches;
     newMatch.push([choice, replace]);
 
     var newObject = {
-      firstItem: newScenarios[0].id,
-      secondItem: newScenarios[1].id
+      firstItem: firstItem,
+      secondItem: secondItem
     };
 
     this.setState({
@@ -123,19 +132,6 @@ export default class MainProgram extends React.Component {
       Also, React is not letting me set any new state inside render(), how am I supposed to get a new one if this is the first turn?
     */
 
-/*
-    var scenario = [];
-    if(this.state.nextMatch.firstItem != null){
-
-      scenario = this.getNextMatch();
-
-    }else{
-
-      var scenarios = JSON.parse(localStorage.getItem('scenarios'));
-      shuffleScenarios(scenarios);     
-      scenario.push(scenarios[0], scenarios[1]);
-    }
-*/
     return (
       <div className="MainProgram">
         <p>Which one is the worst?</p>
