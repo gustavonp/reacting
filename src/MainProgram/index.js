@@ -12,7 +12,8 @@ export default class MainProgram extends React.Component {
       nextMatch: this.getFirstMatch(),
       votes: [],
       chosen: null,
-      turns: 0
+      turns: 0,
+      enough: false
     }
   }
 
@@ -51,8 +52,6 @@ export default class MainProgram extends React.Component {
   }
 
   handleClick(choice) {
-    //this.state.votes //Hold this for now.
-
     var replace = (choice == this.state.nextMatch.firstItem.id) ? this.state.nextMatch.secondItem.id : this.state.nextMatch.firstItem.id;
     var newScenario = reshuffleScenarios(choice, replace, this.state.matches);
 
@@ -73,6 +72,10 @@ export default class MainProgram extends React.Component {
     var newMatch = this.state.matches;
     newMatch.push([choice, replace]);
 
+    var votes = this.state.votes;
+    votes.push(choice);
+    votes.sort((a, b) => a - b); //lovely ES6 way to fix sort(); function from alphabetically to numerically 
+
     var newObject = {
       firstItem: firstItem,
       secondItem: secondItem
@@ -81,6 +84,7 @@ export default class MainProgram extends React.Component {
     this.setState({
       matches: newMatch,
       nextMatch: newObject,
+      votes: votes,
       chosen: choice,
       turns: this.state.turns++
     });
@@ -120,6 +124,12 @@ export default class MainProgram extends React.Component {
     );
   }
 
+  enoughButton(){
+    this.setState({
+      enough: true
+    });
+  }
+
   render() {
     /*
       TODO:
@@ -131,11 +141,25 @@ export default class MainProgram extends React.Component {
       G: This would make me add more information on this.state, instead of just two ints I also would have to save two strings.
       Also, React is not letting me set any new state inside render(), how am I supposed to get a new one if this is the first turn?
     */
+    if(this.state.enough === true){
+      console.log('enough');
+    }else{
+      console.log('continue');
+    }
 
     return (
       <div className="MainProgram">
         <p>Which one is the worst?</p>
-        <center>{this.renderOptions(this.state.nextMatch.firstItem, this.state.nextMatch.secondItem)}</center>
+        <center>
+          {this.renderOptions(this.state.nextMatch.firstItem, this.state.nextMatch.secondItem)}
+          <div>
+            <button
+            type="button"
+            id="optionA"
+            onClick={() => this.enoughButton()}
+          >Enough!</button>
+          </div>
+        </center>
       </div>
     );
   }
