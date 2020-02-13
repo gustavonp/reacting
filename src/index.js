@@ -16,8 +16,8 @@ import MainProgram from './MainProgram';
 //DONE Guardar as votações
 //DONE se o match já foi, trocar
 //DONE trocar o não escolhido
-// criar botão de parar
-// mostrar todos os votos
+//DONE criar botão de parar
+//DONE mostrar todos os votos
 // se todas as possibilidades com o "mais odiado" acabar, trocar os dois
 // se todasas possibilidadex esgorarem, terminar o jogo
 /* =============================================================== */

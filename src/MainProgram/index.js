@@ -1,6 +1,6 @@
 import React from 'react';
 import './style.css';
-import { shuffleScenarios, reshuffleScenarios } from '../utilities';
+import { shuffleScenarios, reshuffleScenarios, fetchScenario, fetchNewPair, compare } from '../utilities';
 
 
 export default class MainProgram extends React.Component {
@@ -31,10 +31,10 @@ export default class MainProgram extends React.Component {
     var x, y = null;
     
     for(var i = 0; i < scenarios.length; i++){
-      if(scenarios[i].id == this.state.nextMatch.firstItem){
+      if(scenarios[i].id === this.state.nextMatch.firstItem){
         x = scenarios[i];
       }
-      if(scenarios[i].id == this.state.nextMatch.secondItem){
+      if(scenarios[i].id === this.state.nextMatch.secondItem){
         y = scenarios[i];
       }
     }
@@ -52,18 +52,23 @@ export default class MainProgram extends React.Component {
   }
 
   handleClick(choice) {
-    var replace = (choice == this.state.nextMatch.firstItem.id) ? this.state.nextMatch.secondItem.id : this.state.nextMatch.firstItem.id;
+    var replace = (choice === this.state.nextMatch.firstItem.id) ? this.state.nextMatch.secondItem.id : this.state.nextMatch.firstItem.id;
     var newScenario = reshuffleScenarios(choice, replace, this.state.matches);
 
-    if(choice == this.state.nextMatch.firstItem.id){
+    /* fix this */
+    if(!newScenario){
+      newScenario = fetchNewPair(choice, replace, this.state.matches);
+    }
+
+    if(choice === this.state.nextMatch.firstItem.id){
       var firstItem = this.state.nextMatch.firstItem;
       var secondItem = {
         id: newScenario.id,
         scenario: newScenario.scenario
       }
     }else{
-      var secondItem = this.state.nextMatch.secondItem;
-      var firstItem = {
+      secondItem = this.state.nextMatch.secondItem;
+      firstItem = {
         id: newScenario.id,
         scenario: newScenario.scenario
       }
@@ -90,14 +95,6 @@ export default class MainProgram extends React.Component {
     });
   }
 
-  /* 
-    TODO: on handleClick call:
-
-    Since you are not interested in the Click Native Event, your onClick can be simplified to:
-    - onClick={this.handleClick(......)}
-
-    G: ReactJS responded with an error when I removed the fat arrow
-  */
   renderOptions(scenarioOne, scenarioTwo) {
     if(!this.state.enough){
       return (
@@ -131,7 +128,7 @@ export default class MainProgram extends React.Component {
           <div className="enoughResults">
             <p>Enough</p>
           </div>
-          /* future Enough layout goes here */
+          {this.renderScore()}
         </div>
       );
     }
@@ -141,16 +138,24 @@ export default class MainProgram extends React.Component {
     this.setState({
       enough: true
     });
+  }
 
+  renderScore() {
     let current = null;
     let cnt = 0;
-
-    /* check with Nuki */
+    let scoring = [];
+    let scoreboard = [];
 
     for(let i = 0; i < this.state.turns; i++){
-      if(this.state.votes[i] != current){
+      if(this.state.votes[i] !== current){
         if(cnt > 0){
-          console.log(current + ' --> ' + cnt + ' times<br>');
+          scoring.push(
+            {
+              current: current, 
+              cnt: cnt
+            }
+          );
+
         }
         current = this.state.votes[i];
         cnt = 1;
@@ -159,30 +164,28 @@ export default class MainProgram extends React.Component {
       }
     }
     if (cnt > 0) {
-      console.log(current + ' --> ' + cnt + ' times');
+      scoring.push(
+        {
+          current: current, 
+          cnt: cnt
+        }
+      );
     }
+    
+    scoring.sort(compare);
 
-    console.log(this.state.matches);
-    // console.log(this.state.turns);
+    scoring.forEach(function(entry) {
+      scoreboard.push(
+        <div key={entry.current}>
+          <b>{fetchScenario(entry.current)}</b>: has {entry.cnt} {entry.cnt === 1 ? 'vote.' : 'votes.'}
+        </div>
+      )
+    });
 
-
-    /**
-     * - dump all voting array on screen
-     * - 
-     */
+    return scoreboard;
   }
 
   render() {
-    /*
-      TODO:
-      Do not set scenario = [] here, avoid creating short lived states in memory,
-      instead, use the state to store your Current game state.
-
-      If you need to calculate your nextMatch, you can also store in the state, no worries
-
-      G: This would make me add more information on this.state, instead of just two ints I also would have to save two strings.
-      Also, React is not letting me set any new state inside render(), how am I supposed to get a new one if this is the first turn?
-    */
     if(this.state.enough === true){
       // console.log('enough');
     }else{

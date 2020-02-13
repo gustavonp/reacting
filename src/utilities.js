@@ -23,7 +23,7 @@ export function shuffleScenarios (array) {
  */
 export function reshuffleScenarios (chosenOption, optionToReplace, matchedScenarios){
 
-  var allScenarios = JSON.parse(localStorage.getItem('scenarios')); 
+  var allScenarios = JSON.parse(localStorage.getItem('scenarios'));
   shuffleScenarios(allScenarios);
 
   var x = 0;
@@ -33,8 +33,39 @@ export function reshuffleScenarios (chosenOption, optionToReplace, matchedScenar
   };
 
   for(x = 0; x < allScenarios.length; x++){
-    if(allScenarios[x].id != chosenOption && allScenarios[x].id != optionToReplace){
+    if(allScenarios[x].id !== chosenOption && allScenarios[x].id !== optionToReplace){
       if(validateComparison(chosenOption, allScenarios[x].id, matchedScenarios)){
+
+        fetchNewScenario.id = allScenarios[x].id;
+        fetchNewScenario.scenario = allScenarios[x].scenario;
+        break;
+      }
+    }
+  }
+  if(fetchNewScenario.id == null){
+    alert('There are no more matches');
+    return false;
+    // fetchNewPair(chosenOption, optionToReplace, matchedScenarios);
+  }
+  return {
+    id: fetchNewScenario.id,
+    scenario: fetchNewScenario.scenario
+  };
+}
+
+export function fetchNewPair(chosenOption, optionToReplace, matchedScenarios) {
+  var allScenarios = JSON.parse(localStorage.getItem('scenarios'));
+  shuffleScenarios(allScenarios);
+
+  var x = 0;
+  var fetchNewScenario = {
+    id: null,
+    scenario: ''
+  };
+
+  for(x = 0; x < allScenarios.length; x++){
+    if(allScenarios[x].id !== optionToReplace && allScenarios[x].id !== chosenOption){
+      if(validateComparison(optionToReplace, allScenarios[x].id, matchedScenarios)){
 
         fetchNewScenario.id = allScenarios[x].id;
         fetchNewScenario.scenario = allScenarios[x].scenario;
@@ -66,4 +97,37 @@ function validateComparison(chosenOption, newMatch, oldMatches){
     }
   }
   return true;
+}
+
+/**
+ * fetchScenario
+ * @param {num} id scenario is
+ */
+export function fetchScenario(id){
+  var allScenarios = JSON.parse(localStorage.getItem('scenarios'));
+  for(let i = 0; i < allScenarios.length; i++){
+    if(allScenarios[i].id === id){
+      return allScenarios[i].scenario;
+    }
+  }
+  return false;
+}
+
+/**
+ * compare
+ * @param {obj} a first item to compare
+ * @param {obj} b second item to compare
+ */
+export function compare(a, b){
+  const votesA = a.cnt;
+  const votesB = b.cnt;
+
+  let comparison = 0;
+  if(votesA < votesB){
+    comparison = 1;
+  }else{
+    comparison = -1;
+  }
+
+  return comparison;
 }
