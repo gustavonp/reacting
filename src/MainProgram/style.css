@@ -25,3 +25,7 @@
   width: 200px;
   height:75px;
 }
+
+.enoughResults{
+  clear: both;
+}

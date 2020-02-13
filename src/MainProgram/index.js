@@ -86,7 +86,7 @@ export default class MainProgram extends React.Component {
       nextMatch: newObject,
       votes: votes,
       chosen: choice,
-      turns: this.state.turns++
+      turns: (this.state.turns + 1)
     });
   }
 
@@ -99,35 +99,77 @@ export default class MainProgram extends React.Component {
     G: ReactJS responded with an error when I removed the fat arrow
   */
   renderOptions(scenarioOne, scenarioTwo) {
-    return (
-      <div className="Scenarios">
-        <div className="caseA">
-          <button
-            type="button"
-            id="optionA"
-            onClick={() => this.handleClick(scenarioOne.id)}
-          >
-            {scenarioOne.scenario}
-          </button>
+    if(!this.state.enough){
+      return (
+        <div className="Scenarios">
+          <div className="caseA">
+            <button
+              type="button"
+              id="optionA"
+              onClick={() => this.handleClick(scenarioOne.id)}
+            >
+              {scenarioOne.scenario}
+            </button>
+          </div>
+          <div className="or">OR</div>
+          <div className="caseB">
+            <button
+              type="button"
+              id="optionB"
+              onClick={() => this.handleClick(scenarioTwo.id)}
+            >
+            {scenarioTwo.scenario}
+            </button>
+          </div>
         </div>
-        <div className="or">OR</div>
-        <div className="caseB">
-          <button
-            type="button"
-            id="optionB"
-            onClick={() => this.handleClick(scenarioTwo.id)}
-          >
-          {scenarioTwo.scenario}
-          </button>
+      );
+    }else{
+      return(
+        <div className="Scenarios">
+          <div className="caseA"></div>
+          <div className="caseB"></div>
+          <div className="enoughResults">
+            <p>Enough</p>
+          </div>
+          /* future Enough layout goes here */
         </div>
-      </div>
-    );
+      );
+    }
   }
 
   enoughButton(){
     this.setState({
       enough: true
     });
+
+    let current = null;
+    let cnt = 0;
+
+    /* check with Nuki */
+
+    for(let i = 0; i < this.state.turns; i++){
+      if(this.state.votes[i] != current){
+        if(cnt > 0){
+          console.log(current + ' --> ' + cnt + ' times<br>');
+        }
+        current = this.state.votes[i];
+        cnt = 1;
+      }else{
+        cnt++;
+      }
+    }
+    if (cnt > 0) {
+      console.log(current + ' --> ' + cnt + ' times');
+    }
+
+    console.log(this.state.matches);
+    // console.log(this.state.turns);
+
+
+    /**
+     * - dump all voting array on screen
+     * - 
+     */
   }
 
   render() {
@@ -142,9 +184,9 @@ export default class MainProgram extends React.Component {
       Also, React is not letting me set any new state inside render(), how am I supposed to get a new one if this is the first turn?
     */
     if(this.state.enough === true){
-      console.log('enough');
+      // console.log('enough');
     }else{
-      console.log('continue');
+      // console.log('continue');
     }
 
     return (
