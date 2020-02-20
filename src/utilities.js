@@ -22,64 +22,100 @@ export function shuffleScenarios (array) {
  * @param {obj} matchedScenarios all previously matched scenarios
  */
 export function reshuffleScenarios (chosenOption, optionToReplace, matchedScenarios){
+  //- Grab both the voted scenario and the discarted scenario
+  //- Fetch a new pair for the voted scenario that is not inside the array of previous matches
 
-  var allScenarios = JSON.parse(localStorage.getItem('scenarios'));
-  shuffleScenarios(allScenarios);
+  //- if all combinations with the voted scenario were made, switch it with the discarted scenario
+  //- Fetch a new pair for the discarted scenario that is not inside the array of the previous matches
 
-  var x = 0;
-  var fetchNewScenario = {
-    id: null,
-    scenario: ''
+  // - if all combinations with the discarted scenario were made, randomly select a new pair
+
+  // - if all possible combinations were made, finish the game.
+
+  let x = 0;
+  var fetchNewScenarios = {
+    id1: null,
+    scenario1: '',
+    id2: null,
+    scenario2: ''
   };
 
+  const allScenarios = JSON.parse(localStorage.getItem('scenarios'));
+  shuffleScenarios(allScenarios);
+
+
   for(x = 0; x < allScenarios.length; x++){
-    if(allScenarios[x].id !== chosenOption && allScenarios[x].id !== optionToReplace){
+    if(allScenarios[x].id !== chosenOption && allScenarios[x].id !== optionToReplace){  //if new scenario is different from the voted scenario and different from the dircarded scenario
       if(validateComparison(chosenOption, allScenarios[x].id, matchedScenarios)){
 
-        fetchNewScenario.id = allScenarios[x].id;
-        fetchNewScenario.scenario = allScenarios[x].scenario;
+        console.log('new match');
+        fetchNewScenarios.id1 = chosenOption;
+        fetchNewScenarios.scenario1 = fetchScenario(chosenOption);
+        fetchNewScenarios.id2 = allScenarios[x].id;
+        fetchNewScenarios.scenario2 = allScenarios[x].scenario;
         break;
       }
     }
   }
-  if(fetchNewScenario.id == null){
-    alert('There are no more matches');
-    return false;
-    // fetchNewPair(chosenOption, optionToReplace, matchedScenarios);
+  
+  if(fetchNewScenarios.id1 == null){
+    for(x = 0; x < allScenarios.length; x++){
+      if(allScenarios[x].id !== chosenOption && allScenarios[x].id !== optionToReplace){
+        if(validateComparison(optionToReplace, allScenarios[x].id, matchedScenarios)){
+
+          console.log('new pair with discarted');
+          fetchNewScenarios.id1 = optionToReplace;
+          fetchNewScenarios.scenario1 = fetchScenario(optionToReplace);
+          fetchNewScenarios.id2 = allScenarios[x].id;
+          fetchNewScenarios.scenario2 = allScenarios[x].scenario;
+          break;
+        }
+      }
+    }
   }
-  return {
-    id: fetchNewScenario.id,
-    scenario: fetchNewScenario.scenario
-  };
+
+  if(fetchNewScenarios.id1 == null){
+    console.log('new pair');
+    var newPair = fetchNewPair(matchedScenarios);
+    if(!newPair.id1){
+      alert('There are no more combinations available');
+      //Enough function
+    }
+  }
+
+  return fetchNewScenarios;
 }
 
-export function fetchNewPair(chosenOption, optionToReplace, matchedScenarios) {
-  var allScenarios = JSON.parse(localStorage.getItem('scenarios'));
+/**
+ * fetchNewPair
+ * @param {obj} matchedScenarios all previously matched scenarios
+ */
+function fetchNewPair(matchedScenarios) {
+  let x = 0;
+
+  const allScenarios = JSON.parse(localStorage.getItem('scenarios'));
   shuffleScenarios(allScenarios);
 
-  var x = 0;
-  var fetchNewScenario = {
-    id: null,
-    scenario: ''
-  };
+  var newScenario = {
+    id1: null,
+    scenario1: '',
+    id2: null,
+    scenario2: ''
+  }
 
-  for(x = 0; x < allScenarios.length; x++){
-    if(allScenarios[x].id !== optionToReplace && allScenarios[x].id !== chosenOption){
-      if(validateComparison(optionToReplace, allScenarios[x].id, matchedScenarios)){
+  for(x = 0; x < allScenarios.length - 1; x++){
+    
+    if(validateComparison(allScenarios[x].id, allScenarios[x+1].id, matchedScenarios)){
 
-        fetchNewScenario.id = allScenarios[x].id;
-        fetchNewScenario.scenario = allScenarios[x].scenario;
-        break;
-      }
+      newScenario.id1 = allScenarios[x].id;
+      newScenario.scenario1 = allScenarios[x].scenario;
+      newScenario.id2 = allScenarios[x+1].id;
+      newScenario.scenario2 = allScenarios[x+1].scenario;
+      break;
     }
   }
-  if(fetchNewScenario.id == null){
-    alert('There are no more matches');
-  }
-  return {
-    id: fetchNewScenario.id,
-    scenario: fetchNewScenario.scenario
-  };
+
+  return newScenario;
 }
 
 /** 
@@ -89,9 +125,8 @@ export function fetchNewPair(chosenOption, optionToReplace, matchedScenarios) {
  * @param {obj} oldMatches all previous matches
  */
 function validateComparison(chosenOption, newMatch, oldMatches){
-  var x = oldMatches.length;
-
-  for(var i = 0; i < x; i++){
+  let x = oldMatches.length;
+  for(let i = 0; i < x; i++){
     if(oldMatches[i].includes(chosenOption) && oldMatches[i].includes(newMatch)){
       return false;
     }
@@ -104,13 +139,9 @@ function validateComparison(chosenOption, newMatch, oldMatches){
  * @param {num} id scenario is
  */
 export function fetchScenario(id){
-  var allScenarios = JSON.parse(localStorage.getItem('scenarios'));
-  for(let i = 0; i < allScenarios.length; i++){
-    if(allScenarios[i].id === id){
-      return allScenarios[i].scenario;
-    }
-  }
-  return false;
+  const allScenarios = JSON.parse(localStorage.getItem('scenarios'));
+  const { scenario } = allScenarios.find(c => c.id === id);
+  return scenario;
 }
 
 /**

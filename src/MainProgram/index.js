@@ -1,6 +1,6 @@
 import React from 'react';
 import './style.css';
-import { shuffleScenarios, reshuffleScenarios, fetchScenario, fetchNewPair, compare } from '../utilities';
+import { shuffleScenarios, reshuffleScenarios, fetchScenario, compare } from '../utilities';
 
 
 export default class MainProgram extends React.Component {
@@ -53,33 +53,38 @@ export default class MainProgram extends React.Component {
 
   handleClick(choice) {
     var replace = (choice === this.state.nextMatch.firstItem.id) ? this.state.nextMatch.secondItem.id : this.state.nextMatch.firstItem.id;
-    var newScenario = reshuffleScenarios(choice, replace, this.state.matches);
-
-    /* fix this */
-    if(!newScenario){
-      newScenario = fetchNewPair(choice, replace, this.state.matches);
-    }
-
-    if(choice === this.state.nextMatch.firstItem.id){
-      var firstItem = this.state.nextMatch.firstItem;
-      var secondItem = {
-        id: newScenario.id,
-        scenario: newScenario.scenario
-      }
-    }else{
-      secondItem = this.state.nextMatch.secondItem;
-      firstItem = {
-        id: newScenario.id,
-        scenario: newScenario.scenario
-      }
-    }
-
+    
     var newMatch = this.state.matches;
     newMatch.push([choice, replace]);
-
     var votes = this.state.votes;
     votes.push(choice);
     votes.sort((a, b) => a - b); //lovely ES6 way to fix sort(); function from alphabetically to numerically 
+    
+    var newScenario = reshuffleScenarios(choice, replace, newMatch);
+
+    
+    if(choice === newScenario.id2){
+      // var firstItem = this.state.nextMatch.firstItem;
+      var firstItem = {
+        id: newScenario.id2,
+        scenario: newScenario.scenario2
+      };
+      var secondItem = {
+        id: newScenario.id1,
+        scenario: newScenario.scenario1
+      }
+    }else{
+      // secondItem = this.state.nextMatch.secondItem;
+      var secondItem = {
+        id: newScenario.id2,
+        scenario: newScenario.scenario2
+      };
+      var firstItem = {
+        id: newScenario.id1,
+        scenario: newScenario.scenario1
+      }
+    }
+
 
     var newObject = {
       firstItem: firstItem,
