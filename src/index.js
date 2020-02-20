@@ -18,8 +18,9 @@ import MainProgram from './MainProgram';
 //DONE trocar o não escolhido
 //DONE criar botão de parar
 //DONE mostrar todos os votos
-// se todas as possibilidades com o "mais odiado" acabar, trocar os dois
-// se todasas possibilidadex esgorarem, terminar o jogo
+//DONE se todas as possibilidades com o "mais odiado" acabar, trocar os dois
+// fix button position switching
+// se todasas possibilidades esgorarem, terminar o jogo
 /* =============================================================== */
 
 /**
