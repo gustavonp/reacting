@@ -1,8 +1,42 @@
+export function getFirstMatch(){
+  var scenarios = JSON.parse(localStorage.getItem('scenarios'));
+  shuffleScenarios(scenarios);     
+  return {
+    firstItem: scenarios[0],
+    secondItem: scenarios[1]
+  };
+}
+
+export function getNextMatch(){
+  var scenarios = JSON.parse(localStorage.getItem('scenarios'));
+  var x, y = null;
+  
+  for(var i = 0; i < scenarios.length; i++){
+    if(scenarios[i].id === this.state.nextMatch.firstItem){
+      x = scenarios[i];
+    }
+    if(scenarios[i].id === this.state.nextMatch.secondItem){
+      y = scenarios[i];
+    }
+  }
+  return [x, y];
+}
+
+export function setNextMatch(firstChoice, secondChoice){
+  var newObject = {
+    firstItem: firstChoice,
+    secondItem: secondChoice
+  }
+  this.setState({
+    nextMatch: newObject
+  });
+}
+
 /**
  * Grab the whole database and shuffle it
  * @param {array} array all atabase
  */
-export function shuffleScenarios (array) {
+function shuffleScenarios (array) {
   var i = 0
     , j = 0
     , temp = null
@@ -22,15 +56,6 @@ export function shuffleScenarios (array) {
  * @param {obj} matchedScenarios all previously matched scenarios
  */
 export function reshuffleScenarios (chosenOption, optionToReplace, matchedScenarios){
-  //- Grab both the voted scenario and the discarted scenario
-  //- Fetch a new pair for the voted scenario that is not inside the array of previous matches
-
-  //- if all combinations with the voted scenario were made, switch it with the discarted scenario
-  //- Fetch a new pair for the discarted scenario that is not inside the array of the previous matches
-
-  // - if all combinations with the discarted scenario were made, randomly select a new pair
-
-  // - if all possible combinations were made, finish the game.
 
   let x = 0;
   var fetchNewScenarios = {
@@ -79,7 +104,7 @@ export function reshuffleScenarios (chosenOption, optionToReplace, matchedScenar
     var newPair = fetchNewPair(matchedScenarios);
     if(!newPair.id1){
       alert('There are no more combinations available');
-      //Enough function
+      return false;
     }
   }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import './style.css';
-import { shuffleScenarios, reshuffleScenarios, fetchScenario, compare } from '../utilities';
+import { getFirstMatch, reshuffleScenarios, fetchScenario, compare } from '../utilities';
 
 
 export default class MainProgram extends React.Component {
@@ -9,46 +9,12 @@ export default class MainProgram extends React.Component {
     super(props);
     this.state = {
       matches: [],
-      nextMatch: this.getFirstMatch(),
+      nextMatch: getFirstMatch(),
       votes: [],
       chosen: null,
       turns: 0,
       enough: false
     }
-  }
-
-  getFirstMatch(){
-    var scenarios = JSON.parse(localStorage.getItem('scenarios'));
-    shuffleScenarios(scenarios);     
-    return {
-      firstItem: scenarios[0],
-      secondItem: scenarios[1]
-    };
-  }
-
-  getNextMatch(){
-    var scenarios = JSON.parse(localStorage.getItem('scenarios'));
-    var x, y = null;
-    
-    for(var i = 0; i < scenarios.length; i++){
-      if(scenarios[i].id === this.state.nextMatch.firstItem){
-        x = scenarios[i];
-      }
-      if(scenarios[i].id === this.state.nextMatch.secondItem){
-        y = scenarios[i];
-      }
-    }
-    return [x, y];
-  }
-
-  setNextMatch(firstChoice, secondChoice){
-    var newObject = {
-      firstItem: firstChoice,
-      secondItem: secondChoice
-    }
-    this.setState({
-      nextMatch: newObject
-    });
   }
 
   handleClick(choice) {
@@ -62,42 +28,47 @@ export default class MainProgram extends React.Component {
     
     var newScenario = reshuffleScenarios(choice, replace, newMatch);
 
-    
-    if(choice === newScenario.id2){
-      // var firstItem = this.state.nextMatch.firstItem;
-      var firstItem = {
-        id: newScenario.id2,
-        scenario: newScenario.scenario2
-      };
-      var secondItem = {
-        id: newScenario.id1,
-        scenario: newScenario.scenario1
-      }
+    if(!newScenario){
+      this.setState({
+        enough: true
+      });
     }else{
-      // secondItem = this.state.nextMatch.secondItem;
-      var secondItem = {
-        id: newScenario.id2,
-        scenario: newScenario.scenario2
-      };
-      var firstItem = {
-        id: newScenario.id1,
-        scenario: newScenario.scenario1
+      if(choice === newScenario.id2){
+        // var firstItem = this.state.nextMatch.firstItem;
+        var firstItem = {
+          id: newScenario.id2,
+          scenario: newScenario.scenario2
+        };
+        var secondItem = {
+          id: newScenario.id1,
+          scenario: newScenario.scenario1
+        }
+      }else{
+        // secondItem = this.state.nextMatch.secondItem;
+        var secondItem = {
+          id: newScenario.id2,
+          scenario: newScenario.scenario2
+        };
+        var firstItem = {
+          id: newScenario.id1,
+          scenario: newScenario.scenario1
+        }
       }
+
+
+      var newObject = {
+        firstItem: firstItem,
+        secondItem: secondItem
+      };
+
+      this.setState({
+        matches: newMatch,
+        nextMatch: newObject,
+        votes: votes,
+        chosen: choice,
+        turns: (this.state.turns + 1)
+      });
     }
-
-
-    var newObject = {
-      firstItem: firstItem,
-      secondItem: secondItem
-    };
-
-    this.setState({
-      matches: newMatch,
-      nextMatch: newObject,
-      votes: votes,
-      chosen: choice,
-      turns: (this.state.turns + 1)
-    });
   }
 
   renderOptions(scenarioOne, scenarioTwo) {
