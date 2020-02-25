@@ -33,7 +33,8 @@ export default class MainProgram extends React.Component {
         enough: true
       });
     }else{
-      if(choice === newScenario.id2){
+
+      if(this.state.nextMatch.secondItem.id === newScenario.id1){
         // var firstItem = this.state.nextMatch.firstItem;
         var firstItem = {
           id: newScenario.id2,

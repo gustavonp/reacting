@@ -1,3 +1,6 @@
+/**
+ * Get the first game match
+ */
 export function getFirstMatch(){
   var scenarios = JSON.parse(localStorage.getItem('scenarios'));
   shuffleScenarios(scenarios);     
@@ -7,6 +10,9 @@ export function getFirstMatch(){
   };
 }
 
+/**
+ * Get the next new match
+ */
 export function getNextMatch(){
   var scenarios = JSON.parse(localStorage.getItem('scenarios'));
   var x, y = null;
@@ -22,6 +28,11 @@ export function getNextMatch(){
   return [x, y];
 }
 
+/**
+ * Set next match
+ * @param {obj} firstChoice first chosen option
+ * @param {obj} secondChoice second chosen option
+ */
 export function setNextMatch(firstChoice, secondChoice){
   var newObject = {
     firstItem: firstChoice,
@@ -73,7 +84,6 @@ export function reshuffleScenarios (chosenOption, optionToReplace, matchedScenar
     if(allScenarios[x].id !== chosenOption && allScenarios[x].id !== optionToReplace){  //if new scenario is different from the voted scenario and different from the dircarded scenario
       if(validateComparison(chosenOption, allScenarios[x].id, matchedScenarios)){
 
-        console.log('new match');
         fetchNewScenarios.id1 = chosenOption;
         fetchNewScenarios.scenario1 = fetchScenario(chosenOption);
         fetchNewScenarios.id2 = allScenarios[x].id;
@@ -88,7 +98,6 @@ export function reshuffleScenarios (chosenOption, optionToReplace, matchedScenar
       if(allScenarios[x].id !== chosenOption && allScenarios[x].id !== optionToReplace){
         if(validateComparison(optionToReplace, allScenarios[x].id, matchedScenarios)){
 
-          console.log('new pair with discarted');
           fetchNewScenarios.id1 = optionToReplace;
           fetchNewScenarios.scenario1 = fetchScenario(optionToReplace);
           fetchNewScenarios.id2 = allScenarios[x].id;
@@ -100,7 +109,6 @@ export function reshuffleScenarios (chosenOption, optionToReplace, matchedScenar
   }
 
   if(fetchNewScenarios.id1 == null){
-    console.log('new pair');
     var newPair = fetchNewPair(matchedScenarios);
     if(!newPair.id1){
       alert('There are no more combinations available');

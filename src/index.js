@@ -8,21 +8,6 @@ import LocalStorageDatabase from './services/database';
 // Components
 import MainProgram from './MainProgram';
 
-/* DN: Move those items to GitHub Issues --> write them in English */
-//DONE Criar DBs
-//DONE puxar infos
-//DONE randomizar
-//DONE puxar 2
-//DONE Guardar as votações
-//DONE se o match já foi, trocar
-//DONE trocar o não escolhido
-//DONE criar botão de parar
-//DONE mostrar todos os votos
-//DONE se todas as possibilidades com o "mais odiado" acabar, trocar os dois
-//DONE se todasas possibilidades esgorarem, terminar o jogo
-// fix button position switching
-/* =============================================================== */
-
 /**
  * Main application
  */
