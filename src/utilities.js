@@ -1,8 +1,10 @@
+const scenariosFromDB = JSON.parse(localStorage.getItem("scenarios"));
+
 /**
  * Get the first game match
  */
 export function getFirstMatch() {
-  var scenarios = JSON.parse(localStorage.getItem("scenarios"));
+  var scenarios = scenariosFromDB;
   shuffleScenarios(scenarios);
   return {
     firstItem: scenarios[0],
@@ -14,7 +16,7 @@ export function getFirstMatch() {
  * Get the next new match
  */
 export function getNextMatch() {
-  var scenarios = JSON.parse(localStorage.getItem("scenarios"));
+  var scenarios = scenariosFromDB;
   var x,
     y = null;
 
@@ -53,7 +55,7 @@ function shuffleScenarios(array) {
     j = 0,
     temp = null;
 
-  for (i = array.length - 1; i > 0; i -= 1) {   // DN: consider using "i--" for readability. It's not wrong, it's just different from the other functions
+  for (i = array.length - 1; i > 0; i--) {
     j = Math.floor(Math.random() * (i + 1));
     temp = array[i];
     array[i] = array[j];
@@ -61,9 +63,8 @@ function shuffleScenarios(array) {
   }
 }
 
-/* Give a more meaningful description of what this function does. */
 /**
- * reshuffleScenarios
+ * Reshuffle scenarios and fetch a new pair, if all possible matches were selected before then fetch a new pair
  * @param {num} chosenOption selected button's ID
  * @param {num} optionToReplace button ID to be replaced
  * @param {obj} matchedScenarios all previously matched scenarios
@@ -80,49 +81,41 @@ export function reshuffleScenarios(
     scenario2: ""
   };
 
-  const allScenarios = JSON.parse(localStorage.getItem("scenarios"));
-  shuffleScenarios(allScenarios);
+  const allScenarios = scenariosFromDB;
+  const arrNewSelections = allScenarios.filter(as => as.id !== chosenOption && as.id !== optionToReplace);
+  const newTry = matchedScenarios.filter(ms => ms.includes(chosenOption));
+  var newArrToCrop = arrNewSelections;
 
-  /* DN: you can declare the variable "x" inside the for-loop. Never reuse variables for iterations */
-  for (let x = 0; x < allScenarios.length; x++) {
-    if (
-      allScenarios[x].id !== chosenOption &&
-      allScenarios[x].id !== optionToReplace
-    ) {
-      //if new scenario is different from the voted scenario and different from the dircarded scenario
-      if (
-        validateComparison(chosenOption, allScenarios[x].id, matchedScenarios)
-      ) {
-        fetchNewScenarios.id1 = chosenOption;
-        fetchNewScenarios.scenario1 = fetchScenario(chosenOption);
-        fetchNewScenarios.id2 = allScenarios[x].id;
-        fetchNewScenarios.scenario2 = allScenarios[x].scenario;
-        break;
-      }
-    }
+  for(let j = 0; j < newTry.length; j++){
+    newArrToCrop = newArrToCrop.filter(nar => nar.id !== newTry[j][0] && nar.id !== newTry[j][1])
   }
 
-  /* DN: The for-loop inside this IF is almost identical to the one above. Is there any way to avoid duplication? [Keep it Dry] */
-  if (fetchNewScenarios.id1 == null) {
-    /* DN: you can declare the variable "x" inside the for-loop. This way it's a new variable with the same name, but scoped to that for-loop only*/
-    for (let x = 0; x < allScenarios.length; x++) {
-      if (
-        allScenarios[x].id !== chosenOption &&
-        allScenarios[x].id !== optionToReplace
-      ) {
+  if(newArrToCrop.length < 1){
+    console.log('bring the next one');
+      for (let y = 0; y < arrNewSelections.length; y++) {
         if (
           validateComparison(
-            optionToReplace,
-            allScenarios[x].id,
-            matchedScenarios
-          )
+          optionToReplace,
+          arrNewSelections[y].id,
+          matchedScenarios)
         ) {
           fetchNewScenarios.id1 = optionToReplace;
           fetchNewScenarios.scenario1 = fetchScenario(optionToReplace);
-          fetchNewScenarios.id2 = allScenarios[x].id;
-          fetchNewScenarios.scenario2 = allScenarios[x].scenario;
+          fetchNewScenarios.id2 = arrNewSelections[y].id;
+          fetchNewScenarios.scenario2 = arrNewSelections[y].scenario;
           break;
         }
+      }
+  }else{
+    for (let x = 0; x < newArrToCrop.length; x++) {
+      if (
+        validateComparison(chosenOption, newArrToCrop[x].id, matchedScenarios)
+      ) {
+        fetchNewScenarios.id1 = chosenOption;
+        fetchNewScenarios.scenario1 = fetchScenario(chosenOption);
+        fetchNewScenarios.id2 = newArrToCrop[x].id;
+        fetchNewScenarios.scenario2 = newArrToCrop[x].scenario;
+        break;
       }
     }
   }
@@ -143,7 +136,7 @@ export function reshuffleScenarios(
  * @param {obj} matchedScenarios all previously matched scenarios
  */
 function fetchNewPair(matchedScenarios) {
-  const allScenarios = JSON.parse(localStorage.getItem("scenarios"));
+  const allScenarios = scenariosFromDB;
   shuffleScenarios(allScenarios);
 
   var newScenario = {
@@ -179,16 +172,8 @@ function fetchNewPair(matchedScenarios) {
  * @param {obj} oldMatches all previous matches
  */
 function validateComparison(chosenOption, newMatch, oldMatches) {
-  let x = oldMatches.length;
-  for (let i = 0; i < x; i++) {
-    if (
-      oldMatches[i].includes(chosenOption) &&
-      oldMatches[i].includes(newMatch)
-    ) {
-      return false;
-    }
-  }
-  return true;
+  const checkMatched = oldMatches.filter(ol => ol.includes(chosenOption) && ol.includes(newMatch));
+  return checkMatched.length == 0 ? true : false ;
 }
 
 /**
@@ -196,7 +181,7 @@ function validateComparison(chosenOption, newMatch, oldMatches) {
  * @param {num} id scenario is
  */
 export function fetchScenario(id) {
-  const allScenarios = JSON.parse(localStorage.getItem("scenarios"));
+  const allScenarios = scenariosFromDB;
   const { scenario } = allScenarios.find(c => c.id === id);
   return scenario;
 }
@@ -207,15 +192,10 @@ export function fetchScenario(id) {
  * @param {obj} b second item to compare
  */
 export function compare(a, b) {
-  const votesA = a.cnt;
-  const votesB = b.cnt;
+  const votesA = a.counter;
+  const votesB = b.counter;
 
-  let comparison = 0;
-  if (votesA < votesB) {
-    comparison = 1;
-  } else {
-    comparison = -1;
-  }
+  let comparison = votesA < votesB ? 1 : -1;
 
   return comparison;
 }

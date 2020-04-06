@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./style.css";
 import {
   getFirstMatch,
@@ -7,42 +7,113 @@ import {
   compare
 } from "../utilities";
 
-export default class MainProgram extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      matches: [],
-      nextMatch: getFirstMatch(),
-      votes: [],
-      chosen: null,
-      turns: 0,
-      enough: false
-    };
+export default class StartRating extends React.Component {
+  render(){
+    return(
+      <StartProgram/>
+    );
   }
+};
 
-  handleClick(choice) {
-    // DN: Try keeping lines short. There is no rule of thumb, but ideally to avoid scrolling sideways [Readability]
-    var replace =
-      choice === this.state.nextMatch.firstItem.id
-        ? this.state.nextMatch.secondItem.id
-        : this.state.nextMatch.firstItem.id;
+const useRatingState = () => {
+  const [isEnough, setIsEnough] = useState(false);
+  const [matches, setMatches] = useState([]);
+  const [votes, setVotes] = useState([]);
+  const [chosen, setChosem] = useState();
+  const [turns, setTurns] = useState(0);
+  const [nextMatch, setNextMatch] = useState(getFirstMatch());
 
-    var newMatch = this.state.matches;
-    newMatch.push([choice, replace]);
+  useEffect(() => {
+    return () => {};
+  });
 
-    var votes = this.state.votes; // DN: Create some small breathing rooms for readability [Readability]
-    votes.push(choice);
-    votes.sort((a, b) => a - b); //lovely ES6 way to fix sort(); function from alphabetically to numerically
+  const setRatingEnd = () => {
+    setIsEnough(true);
+  };
 
-    var newScenario = reshuffleScenarios(choice, replace, newMatch);
+  const setNewRating = (newMatch, newObject, votes, choice) => {
+    setMatches(newMatch);
+    setNextMatch(newObject);
+    setVotes(votes);
+    setChosem(choice);
+    setTurns(turns + 1);
+  };
 
-    if (!newScenario) {
-      this.setState({
-        enough: true
+  const setRenderScore = () =>{
+    let currentScenario = null;
+    let counter = 0;
+    let scoring = [];
+    let scoreBoard = [];
+    
+    for (let i = 0; i < turns; i++) {
+      if (votes[i] !== currentScenario) {
+        if (counter > 0) {
+          scoring.push({
+            currentScenario: currentScenario,
+            counter: counter
+          });
+        }
+        currentScenario = votes[i];
+        counter = 1;
+      } else {
+        counter++;
+      }
+    }
+    if (counter > 0) {
+      scoring.push({
+        currentScenario: currentScenario,
+        counter: counter
       });
-    } else {
-      if (this.state.nextMatch.secondItem.id === newScenario.id1) {
-        // var firstItem = this.state.nextMatch.firstItem;
+    }
+  
+    scoring.sort(compare);
+
+    return (
+      <ul>
+        {scoring.map(podium =>
+          <div key={podium.currentScenario}>
+          {fetchScenario(podium.currentScenario)}: has {podium.counter} votes
+          </div>)}
+      </ul>
+    );
+  };
+
+  return {
+    isEnough, matches, votes, chosen, turns, nextMatch, setRatingEnd, setNewRating, setRenderScore
+  }
+};
+
+
+const StartProgram = props =>{
+  const {
+    isEnough,
+    matches,
+    votes,
+    chosen,
+    turns,
+    nextMatch,
+    setRatingEnd,
+    setNewRating,
+    setRenderScore
+  } = useRatingState();
+
+  const onScenarioClick = (choice) =>{
+    const optionToReplace = 
+      choice === nextMatch.firstItem.id
+        ? nextMatch.secondItem.id
+        : nextMatch.firstItem.id;
+
+    var newMatch = [...matches, [choice, optionToReplace]];
+
+    var voteCounter = [...votes, choice];
+    voteCounter.sort((a, b) => a - b); //lovely ES6 way to fix sort(); function from alphabetically to numerically
+  
+    var newScenario = reshuffleScenarios(choice, optionToReplace, newMatch);
+    
+    if (!newScenario) {
+      setRatingEnd(true);
+    }else{
+      if (nextMatch.secondItem.id === newScenario.id1) {
         var firstItem = {
           id: newScenario.id2,
           scenario: newScenario.scenario2
@@ -52,7 +123,6 @@ export default class MainProgram extends React.Component {
           scenario: newScenario.scenario1
         };
       } else {
-        // secondItem = this.state.nextMatch.secondItem;
         var secondItem = {
           id: newScenario.id2,
           scenario: newScenario.scenario2
@@ -66,130 +136,102 @@ export default class MainProgram extends React.Component {
       var newObject = {
         firstItem: firstItem,
         secondItem: secondItem
-      };
-
-      this.setState({
-        matches: newMatch,
-        nextMatch: newObject,
-        votes: votes,
-        chosen: choice,
-        turns: this.state.turns + 1
-      });
-    }
-  }
-
-  renderOptions(scenarioOne, scenarioTwo) {
-    if (!this.state.enough) {
-      return (
-        <div className="Scenarios">
-          <div className="caseA">
-            <button
-              type="button"
-              id="optionA"
-              onClick={() => this.handleClick(scenarioOne.id)}
-            >
-              {scenarioOne.scenario}
-            </button>
-          </div>
-          <div className="or">OR</div>
-          <div className="caseB">
-            <button
-              type="button"
-              id="optionB"
-              onClick={() => this.handleClick(scenarioTwo.id)}
-            >
-              {scenarioTwo.scenario}
-            </button>
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div className="Scenarios">
-          <div className="caseA"></div>
-          <div className="caseB"></div>
-          <div className="enoughResults">
-            <p>Enough</p>
-          </div>
-          {this.renderScore()}
-        </div>
-      );
-    }
-  }
-
-  enoughButton() {
-    this.setState({
-      enough: true
-    });
-  }
-
-  renderScore() {
-    let current = null;
-    let cnt = 0;   /* DN: Give a more meaningful name for variables. "cnt" is whay? [Readability] */
-    let scoring = [];
-    let scoreboard = [];  /* DN: Use lowerCamelCase for variable names with multiple words [Standard] */
-
-    for (let i = 0; i < this.state.turns; i++) {
-      if (this.state.votes[i] !== current) {
-        if (cnt > 0) {
-          scoring.push({
-            current: current,
-            cnt: cnt
-          });
-        }
-        current = this.state.votes[i];
-        cnt = 1;
-      } else {
-        cnt++;
       }
     }
-    if (cnt > 0) {
-      scoring.push({
-        current: current,
-        cnt: cnt
-      });
-    }
 
-    scoring.sort(compare);
+    setNewRating(newMatch, newObject, voteCounter, choice);
+  };
 
-    scoring.forEach(function(entry) {
-      scoreboard.push(
-        <div key={entry.current}>
-          <b>{fetchScenario(entry.current)}</b>: has {entry.cnt}{" "}
-          {entry.cnt === 1 ? "vote." : "votes."}
+
+
+  return(
+    <div className="MainProgram">
+      <p>Which one is the worst?</p>
+      <center>
+        <RenderOptions 
+          firstItem={nextMatch.firstItem}
+          secondItem={nextMatch.secondItem} 
+          isEnough={isEnough} 
+          onScenarioClick={onScenarioClick}
+          setRenderScore={setRenderScore}
+        />
+        <div>
+          <Enough onClick={setRatingEnd} />
         </div>
-      );
-    });
+      </center>
+    </div>
+  );
+};
 
-    return scoreboard;
-  }
 
-  render() {
-    if (this.state.enough === true) {
-      // console.log('enough');
-    } else {
-      // console.log('continue');
-    }
-
-    return (
-      <div className="MainProgram">
-        <p>Which one is the worst?</p>
-        <center>
-          {this.renderOptions(
-            this.state.nextMatch.firstItem,
-            this.state.nextMatch.secondItem
-          )}
-          <div>
-            <button
-              type="button"
-              id="optionA"
-              onClick={() => this.enoughButton()}
-            >
-              Enough!
-            </button>
-          </div>
-        </center>
+const RenderOptions = props =>{
+  if(!props.isEnough){
+    return(
+      <div className="Scenarios">
+        <div className="caseA">
+          <ScenarioButton
+            buttonId={'optionA'}
+            scenarioDescription={props.firstItem.scenario}
+            scenarioId={props.firstItem.id}
+            onClick={props.onScenarioClick}
+          />
+        </div>
+        <div className="or">OR</div>
+        <div className="caseB">
+          <ScenarioButton
+            buttonId={'optionB'}
+            scenarioDescription={props.secondItem.scenario}
+            scenarioId={props.secondItem.id}
+            onClick={props.onScenarioClick}
+          />
+        </div>
+      </div>
+    );
+  }else{
+    return(
+      <div className="Scenarios">
+        <div className="caseA"></div>
+        <div className="caseB"></div>
+        <div className="enoughResults">
+          <p>Enough</p>
+        </div>
+        {SetScore(props.setRenderScore)}
       </div>
     );
   }
-}
+};
+
+const ScenarioButton = props =>(
+  <button
+    type="button"
+    id={props.buttonId}
+    onClick={() => props.onClick(props.scenarioId)}
+  >
+    {props.scenarioDescription}
+  </button>
+);
+
+const Enough = props =>(
+  <>
+    <button
+      className="enough-bt"
+      onClick={() => props.onClick()}
+    >
+      Enough!
+    </button>
+  </>
+);
+
+const SetScore = (props) =>{
+  return(
+    <div className="score">
+      {props()}
+    </div>
+  );
+};
+
+
+const MainProgram = () =>{
+  const [ratingId, setRatingId] = useState(1);
+  return <StartRating key={ratingId} startNewRating={setRatingId(ratingId + 1)} />
+};
