@@ -113,36 +113,37 @@ const StartProgram = props =>{
     if (!newScenario) {
       setRatingEnd(true);
     }else{
-      if (nextMatch.secondItem.id === newScenario.id1) {
-        var firstItem = {
-          id: newScenario.id2,
-          scenario: newScenario.scenario2
-        };
-        var secondItem = {
-          id: newScenario.id1,
-          scenario: newScenario.scenario1
-        };
-      } else {
-        var secondItem = {
-          id: newScenario.id2,
-          scenario: newScenario.scenario2
-        };
-        var firstItem = {
-          id: newScenario.id1,
-          scenario: newScenario.scenario1
-        };
-      }
-
-      var newObject = {
-        firstItem: firstItem,
-        secondItem: secondItem
-      }
+      var newObject = setNewPairObject(newScenario);
     }
 
     setNewRating(newMatch, newObject, voteCounter, choice);
   };
 
-
+  const setNewPairObject = (newScenario) =>{
+    if (nextMatch.secondItem.id === newScenario.id1) {
+      var firstItem = {
+        id: newScenario.id2,
+        scenario: newScenario.scenario2
+      };
+      var secondItem = {
+        id: newScenario.id1,
+        scenario: newScenario.scenario1
+      };
+    } else {
+      var secondItem = {
+        id: newScenario.id2,
+        scenario: newScenario.scenario2
+      };
+      var firstItem = {
+        id: newScenario.id1,
+        scenario: newScenario.scenario1
+      };
+    }
+    return({
+      firstItem: firstItem,
+      secondItem: secondItem
+    });
+  }
 
   return(
     <div className="MainProgram">
@@ -162,6 +163,7 @@ const StartProgram = props =>{
     </div>
   );
 };
+
 
 
 const RenderOptions = props =>{
@@ -230,8 +232,3 @@ const SetScore = (props) =>{
   );
 };
 
-
-const MainProgram = () =>{
-  const [ratingId, setRatingId] = useState(1);
-  return <StartRating key={ratingId} startNewRating={setRatingId(ratingId + 1)} />
-};

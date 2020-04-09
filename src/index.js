@@ -6,7 +6,7 @@ import './index.css';
 import LocalStorageDatabase from './services/database';
 
 // Components
-import MainProgram from './MainProgram';
+import StartRating from './MainProgram';
 
 /**
  * Main application
@@ -14,7 +14,6 @@ import MainProgram from './MainProgram';
 class App extends React.Component {
 
   database;
-
   isDatabaseInitialized = false;
 
   constructor(props) {
@@ -26,13 +25,12 @@ class App extends React.Component {
 
   render() {
     if (this.isDatabaseInitialized) {
-
       return (
         <div className="App">
           <h1>
             Infuri<i>rating</i>
           </h1>
-          <MainProgram/>
+          <StartRating/>
         </div>
       );
     } else {
