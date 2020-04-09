@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import './index.css';
 
 // Dependencies
@@ -26,12 +27,18 @@ class App extends React.Component {
   render() {
     if (this.isDatabaseInitialized) {
       return (
-        <div className="App">
-          <h1>
-            Infuri<i>rating</i>
-          </h1>
-          <StartRating/>
-        </div>
+        <Router>
+          <div>
+            <Switch>
+              <Route path="/InfuriRate">
+                <InfuriRate />
+              </Route>
+              <Route path="/">
+                <Home />
+              </Route>
+            </Switch>
+          </div>
+        </Router>
       );
     } else {
       return (
@@ -42,6 +49,27 @@ class App extends React.Component {
       );
     }
   }
+}
+
+function Home() {
+  return (
+    <div className="App">
+      <h1>Infuri<i>rating</i></h1>
+      <p>Add some clever comment about the game here</p>
+      <Link to="/InfuriRate">Begin</Link>
+    </div>
+  );
+}
+
+function InfuriRate() {
+  return (
+    <div className="App">
+      <h1>
+        Infuri<i>rating</i>
+      </h1>
+      <StartRating/>
+    </div>
+  );
 }
 
 /** 
