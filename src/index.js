@@ -1,7 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import App from './App';
+
+ReactDOM.render(<App />, document.getElementById('root'));
+
+/*
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import './index.css';
+
+
+
+import AppAdmin from './AppAdmin.js';
 
 // Dependencies
 import LocalStorageDatabase from './services/database';
@@ -9,9 +20,6 @@ import LocalStorageDatabase from './services/database';
 // Components
 import StartRating from './MainProgram';
 
-/**
- * Main application
- */
 class App extends React.Component {
 
   database;
@@ -32,6 +40,9 @@ class App extends React.Component {
             <Switch>
               <Route path="/InfuriRate">
                 <InfuriRate />
+              </Route>
+              <Route path="/AppAdmin">
+                <AppAdmin />
               </Route>
               <Route path="/">
                 <Home />
@@ -72,7 +83,5 @@ function InfuriRate() {
   );
 }
 
-/** 
- * Starting the game
- */
 ReactDOM.render(<App />, document.getElementById('root'));
+*/

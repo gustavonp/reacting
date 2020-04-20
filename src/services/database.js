@@ -27,3 +27,9 @@ export default class LocalStorageDatabase {
   }
 
 }
+
+export const IsDatabaseInitialized = () => {
+  const database = new LocalStorageDatabase();
+  const isDatabaseInitialized = database.initialize();
+  return (isDatabaseInitialized ? true : false);
+}
