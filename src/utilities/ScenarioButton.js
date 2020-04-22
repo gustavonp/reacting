@@ -6,7 +6,7 @@ export const ScenarioButton = props =>(
     id={props.buttonId}
     onClick={() => props.onClick(props.scenarioId)}
   >
-    {props.scenarioDescription}
+    {props.scenarioDescription} = {props.scenarioId}
   </button>
 );
 

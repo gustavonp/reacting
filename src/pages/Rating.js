@@ -13,22 +13,25 @@ import Enough from '../utilities/Enough';
 
   /*
   TO DO
-  - Try to add some of the onScenarioClick responsibilities to useEffect
   - Can setNewRating be a useReduce?
-  - Apply useContext before rendering
-
-  - create a useState at the Enough! button, so it work work if it's less than 5 votes;
   */
 
 const useRatingState = () => {
   const [isEnough, setIsEnough] = useState(false);
   const [matches, setMatches] = useState([]);
   const [votes, setVotes] = useState([]);
-  const [chosen, setChosem] = useState();
+  const [chosen, setChosem] = useState(null);
   const [turns, setTurns] = useState(0);
   const [nextMatch, setNextMatch] = useState(getFirstMatch());
 
   useEffect(() => {
+    if(chosen){
+      let newVoteSum = [...votes, chosen];
+      newVoteSum.sort((a, b) => a - b);
+      setVotes(newVoteSum);
+      setTurns(turns + 1);          
+      setChosem(null);
+    }
     return () => {};
   });
 
@@ -36,13 +39,18 @@ const useRatingState = () => {
     setIsEnough(true);
   };
 
-  const setNewRating = (newMatch, newObject, votes, choice) => {
-    setMatches(newMatch);
+  const setNewRating = (newObject) => {
     setNextMatch(newObject);
-    setVotes(votes);
-    setChosem(choice);
-    setTurns(turns + 1);
   };
+
+  const setMadeChoice = (choice) => {
+    setChosem(choice);
+    return choice === nextMatch.firstItem.id ? nextMatch.secondItem.id : nextMatch.firstItem.id;
+  }
+
+  const setUpdatedMatches = (newMatch) =>{
+    setMatches(newMatch);
+  }
 
   const setRenderScore = () =>{
     let currentScenario = null;
@@ -84,7 +92,7 @@ const useRatingState = () => {
   };
 
   return {
-    isEnough, matches, votes, chosen, turns, nextMatch, setRatingEnd, setNewRating, setRenderScore
+    isEnough, matches, votes, turns, nextMatch, setRatingEnd, setNewRating, setMadeChoice, setUpdatedMatches, setRenderScore
   }
 };
   
@@ -93,29 +101,23 @@ export const Rating = props =>{
     isEnough,
     matches,
     votes,
-    chosen,
     turns,
     nextMatch,
     setRatingEnd,
     setNewRating,
+    setMadeChoice,
+    setUpdatedMatches,
     setRenderScore
   } = useRatingState();
 
   const context = useContext(ConfigContext);
-  console.log(context.IsDatabaseInitialized);
 
   const onScenarioClick = (choice) =>{
-    const optionToReplace = 
-      choice === nextMatch.firstItem.id
-        ? nextMatch.secondItem.id
-        : nextMatch.firstItem.id;
+    const optionToReplace = setMadeChoice(choice);
 
-    var newMatch = [...matches, [choice, optionToReplace]];
-
-    var voteCounter = [...votes, choice];
-    voteCounter.sort((a, b) => a - b);
-
-    var newScenario = reshuffleScenarios(choice, optionToReplace, newMatch);
+    setUpdatedMatches([...matches, [choice, optionToReplace]]);
+    
+    let newScenario = reshuffleScenarios(choice, optionToReplace, matches);
     
     if (!newScenario) {
       setRatingEnd(true);
@@ -123,25 +125,26 @@ export const Rating = props =>{
       var newObject = setNewPairObject(newScenario);
     }
 
-    setNewRating(newMatch, newObject, voteCounter, choice);
+    setNewRating(newObject);
   };
 
   const setNewPairObject = (newScenario) =>{
+    let firstItem, secondItem;
     if (nextMatch.secondItem.id === newScenario.id1) {
-      var firstItem = {
+      firstItem = {
         id: newScenario.id2,
         scenario: newScenario.scenario2
       };
-      var secondItem = {
+      secondItem = {
         id: newScenario.id1,
         scenario: newScenario.scenario1
       };
     } else {
-      var secondItem = {
+      secondItem = {
         id: newScenario.id2,
         scenario: newScenario.scenario2
       };
-      var firstItem = {
+      firstItem = {
         id: newScenario.id1,
         scenario: newScenario.scenario1
       };
@@ -152,26 +155,40 @@ export const Rating = props =>{
     });
   }
 
-  return(
-    <>
-      <Header />
-      <div className="MainProgram">
-        <p>Which one is the worst?</p>
-        <center>
-          <RenderOptions 
-            firstItem={nextMatch.firstItem}
-            secondItem={nextMatch.secondItem} 
-            isEnough={isEnough} 
-            onScenarioClick={onScenarioClick}
-            setRenderScore={setRenderScore}
-          />
-          <div>
-            <Enough onClick={setRatingEnd} />
-          </div>
-        </center>
-      </div>
-    </>
-  );
+  if(context.IsDatabaseInitialized){
+    return(
+      <>
+        <Header />
+        <div className="MainProgram">
+          <p>Which one is the worst?</p>
+          <center>
+            <RenderOptions 
+              firstItem={nextMatch.firstItem}
+              secondItem={nextMatch.secondItem} 
+              isEnough={isEnough} 
+              onScenarioClick={onScenarioClick}
+              setRenderScore={setRenderScore}
+            />
+            <div>
+              <Enough onClick={setRatingEnd} turns={turns} />
+            </div>
+          </center>
+        </div>
+      </>
+    );
+  }else{
+    return(
+      <>
+        <Header />
+        <div className="MainProgram">
+          <p>Which one is the worst?</p>
+          <center>
+            <p>Problem while loading the game</p>
+          </center>
+        </div>
+      </>
+    );
+  }
 };
 
 export default Rating;
