@@ -7,7 +7,18 @@ import {
   fetchScenario,
   compare
 } from "../utilities";
-import { ConfigContext } from "../App";
+import { ConfigContext } from '../App';
+import RenderOptions from '../utilities/RenderOptions';
+import Enough from '../utilities/Enough';
+
+  /*
+  TO DO
+  - Try to add some of the onScenarioClick responsibilities to useEffect
+  - Can setNewRating be a useReduce?
+  - Apply useContext before rendering
+
+  - create a useState at the Enough! button, so it work work if it's less than 5 votes;
+  */
 
 const useRatingState = () => {
   const [isEnough, setIsEnough] = useState(false);
@@ -77,7 +88,6 @@ const useRatingState = () => {
   }
 };
   
-  
 export const Rating = props =>{
   const {
     isEnough,
@@ -103,8 +113,8 @@ export const Rating = props =>{
     var newMatch = [...matches, [choice, optionToReplace]];
 
     var voteCounter = [...votes, choice];
-    voteCounter.sort((a, b) => a - b); //lovely ES6 way to fix sort(); function from alphabetically to numerically
-  
+    voteCounter.sort((a, b) => a - b);
+
     var newScenario = reshuffleScenarios(choice, optionToReplace, newMatch);
     
     if (!newScenario) {
@@ -143,89 +153,24 @@ export const Rating = props =>{
   }
 
   return(
-    <div className="MainProgram">
-      <p>Which one is the worst?</p>
-      <center>
-        <RenderOptions 
-          firstItem={nextMatch.firstItem}
-          secondItem={nextMatch.secondItem} 
-          isEnough={isEnough} 
-          onScenarioClick={onScenarioClick}
-          setRenderScore={setRenderScore}
-        />
-        <div>
-          <Enough onClick={setRatingEnd} />
-        </div>
-      </center>
-    </div>
-  );
-};
-  
-  
-  
-const RenderOptions = props =>{
-  if(!props.isEnough){
-    return(
-      <div className="Scenarios">
-        <div className="caseA">
-          <ScenarioButton
-            buttonId={'optionA'}
-            scenarioDescription={props.firstItem.scenario}
-            scenarioId={props.firstItem.id}
-            onClick={props.onScenarioClick}
+    <>
+      <Header />
+      <div className="MainProgram">
+        <p>Which one is the worst?</p>
+        <center>
+          <RenderOptions 
+            firstItem={nextMatch.firstItem}
+            secondItem={nextMatch.secondItem} 
+            isEnough={isEnough} 
+            onScenarioClick={onScenarioClick}
+            setRenderScore={setRenderScore}
           />
-        </div>
-        <div className="or">OR</div>
-        <div className="caseB">
-          <ScenarioButton
-            buttonId={'optionB'}
-            scenarioDescription={props.secondItem.scenario}
-            scenarioId={props.secondItem.id}
-            onClick={props.onScenarioClick}
-          />
-        </div>
+          <div>
+            <Enough onClick={setRatingEnd} />
+          </div>
+        </center>
       </div>
-    );
-  }else{
-    return(
-      <div className="Scenarios">
-        <div className="caseA"></div>
-        <div className="caseB"></div>
-        <div className="enoughResults">
-          <p>Enough</p>
-        </div>
-        {SetScore(props.setRenderScore)}
-      </div>
-    );
-  }
-};
-  
-const ScenarioButton = props =>(
-  <button
-    type="button"
-    id={props.buttonId}
-    onClick={() => props.onClick(props.scenarioId)}
-  >
-    {props.scenarioDescription}
-  </button>
-);
-  
-const Enough = props =>(
-  <>
-    <button
-      className="enough-bt"
-      onClick={() => props.onClick()}
-    >
-      Enough!
-    </button>
-  </>
-);
-  
-const SetScore = (props) =>{
-  return(
-    <div className="score">
-      {props()}
-    </div>
+    </>
   );
 };
 
