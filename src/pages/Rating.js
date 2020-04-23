@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useReducer } from "react";
 import { Header } from '../elements/Header';
 import "../MainProgram/style.css";
 import {
@@ -13,8 +13,21 @@ import Enough from '../utilities/Enough';
 
   /*
   TO DO
-  - Can setNewRating be a useReduce?
+  - There is a bug at the enough function, it might be skipping one scenario
+
+  - lets use obj = {...obj, newValue:value } to the new scoreboard, since the old one is killing the 0 IDs.
   */
+
+const matchReducer = (state, action) => {
+  switch (action.type){
+    case 'setNewRating':{
+      return action.data;
+    }
+    default:{
+      return getFirstMatch();
+    }
+  }
+};
 
 const useRatingState = () => {
   const [isEnough, setIsEnough] = useState(false);
@@ -22,43 +35,94 @@ const useRatingState = () => {
   const [votes, setVotes] = useState([]);
   const [chosen, setChosem] = useState(null);
   const [turns, setTurns] = useState(0);
-  const [nextMatch, setNextMatch] = useState(getFirstMatch());
+  const [nextMatch, setNextMatch] = useReducer(matchReducer, getFirstMatch());
 
   useEffect(() => {
     if(chosen){
       let newVoteSum = [...votes, chosen];
+      console.log(newVoteSum);
       newVoteSum.sort((a, b) => a - b);
       setVotes(newVoteSum);
       setTurns(turns + 1);          
       setChosem(null);
     }
     return () => {};
-  });
+  }, [chosen, turns, votes]); //needs to return this to avoid infinite returns
 
   const setRatingEnd = () => {
     setIsEnough(true);
   };
 
-  const setNewRating = (newObject) => {
-    setNextMatch(newObject);
+  const setNewRating = (newMatch) => {
+    setNextMatch({
+      type: 'setNewRating',
+      data: newMatch
+    });
   };
 
   const setMadeChoice = (choice) => {
     setChosem(choice);
     return choice === nextMatch.firstItem.id ? nextMatch.secondItem.id : nextMatch.firstItem.id;
-  }
+  };
 
   const setUpdatedMatches = (newMatch) =>{
     setMatches(newMatch);
-  }
+  };
+
+  const setNextTurn = (choice, optionToReplace) =>{
+    let newScenario = reshuffleScenarios(choice, optionToReplace, matches);
+    if (!newScenario) {
+      setRatingEnd(true);
+    }else{
+      setNewRating(setNewPairObject(newScenario));
+    }
+  };
+
+  const setNewPairObject = (newScenario) =>{
+    let optionA = {
+      id: newScenario.id1,
+      scenario: newScenario.scenario1
+    }
+    let optionB = {
+      id: newScenario.id2,
+      scenario: newScenario.scenario2
+    }
+    
+    if(nextMatch.secondItem.id === newScenario.id1){
+      return {
+        firstItem: optionB,
+        secondItem: optionA
+      }
+    }else{
+      return {
+        firstItem: optionA,
+        secondItem: optionB
+      }
+    }
+  };
 
   const setRenderScore = () =>{
     let currentScenario = null;
     let counter = 0;
     let scoring = [];
     let scoreBoard = [];
+
+    let obj = {
+      a: 0,
+      b: 0
+    }
+
+    obj = { ...obj, a:1, c:2}
+
+    console.log(obj);
+
+    // console.log(turns);
+    // console.log(votes);
     
     for (let i = 0; i < turns; i++) {
+
+      console.log(votes[i])
+
       if (votes[i] !== currentScenario) {
         if (counter > 0) {
           scoring.push({
@@ -92,20 +156,19 @@ const useRatingState = () => {
   };
 
   return {
-    isEnough, matches, votes, turns, nextMatch, setRatingEnd, setNewRating, setMadeChoice, setUpdatedMatches, setRenderScore
+    isEnough, matches, turns, nextMatch, setRatingEnd, setMadeChoice, setNextTurn, setUpdatedMatches, setRenderScore
   }
 };
   
-export const Rating = props =>{
+export const Rating = () =>{
   const {
     isEnough,
     matches,
-    votes,
     turns,
     nextMatch,
     setRatingEnd,
-    setNewRating,
     setMadeChoice,
+    setNextTurn,
     setUpdatedMatches,
     setRenderScore
   } = useRatingState();
@@ -117,43 +180,8 @@ export const Rating = props =>{
 
     setUpdatedMatches([...matches, [choice, optionToReplace]]);
     
-    let newScenario = reshuffleScenarios(choice, optionToReplace, matches);
-    
-    if (!newScenario) {
-      setRatingEnd(true);
-    }else{
-      var newObject = setNewPairObject(newScenario);
-    }
-
-    setNewRating(newObject);
+    setNextTurn(choice, optionToReplace);
   };
-
-  const setNewPairObject = (newScenario) =>{
-    let firstItem, secondItem;
-    if (nextMatch.secondItem.id === newScenario.id1) {
-      firstItem = {
-        id: newScenario.id2,
-        scenario: newScenario.scenario2
-      };
-      secondItem = {
-        id: newScenario.id1,
-        scenario: newScenario.scenario1
-      };
-    } else {
-      secondItem = {
-        id: newScenario.id2,
-        scenario: newScenario.scenario2
-      };
-      firstItem = {
-        id: newScenario.id1,
-        scenario: newScenario.scenario1
-      };
-    }
-    return({
-      firstItem: firstItem,
-      secondItem: secondItem
-    });
-  }
 
   if(context.IsDatabaseInitialized){
     return(
@@ -171,6 +199,10 @@ export const Rating = props =>{
             />
             <div>
               <Enough onClick={setRatingEnd} turns={turns} />
+              {context.isDebugActivate === false ? null : (
+              <p>{`Turns: ${turns}`}<br/>
+              {`Votes: ${matches.map(votes => `${votes[0]} - ${votes[1]} | `)}`}</p>
+              )}
             </div>
           </center>
         </div>

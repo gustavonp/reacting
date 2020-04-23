@@ -8,6 +8,7 @@ import { IsDatabaseInitialized } from './services/database';
 export const ConfigContext = React.createContext();
 
 const configValue = {
+  isDebugActivate: true,
   IsDatabaseInitialized: IsDatabaseInitialized ? true : false
 };
 
