@@ -1,12 +1,15 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
+import { ConfigContext } from '../App';
 
 export const Enough = props => {
   const [enoughButton, setEnoughButton] = useState(true);
-
+  
   useEffect(() => {
-    if (props.turns === 5) setEnoughButton(false);
+    if (props.turns === context.isEnough) setEnoughButton(false);
     return () => {};
   });
+
+  const context = useContext(ConfigContext);
 
   return (
     <>

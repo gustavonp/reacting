@@ -13,9 +13,7 @@ import Enough from '../utilities/Enough';
 
   /*
   TO DO
-  - There is a bug at the enough function, it might be skipping one scenario
-
-  - lets use obj = {...obj, newValue:value } to the new scoreboard, since the old one is killing the 0 IDs.
+  - optimize setRenderScore function
   */
 
 const matchReducer = (state, action) => {
@@ -38,9 +36,8 @@ const useRatingState = () => {
   const [nextMatch, setNextMatch] = useReducer(matchReducer, getFirstMatch());
 
   useEffect(() => {
-    if(chosen){
+    if(chosen !== null){
       let newVoteSum = [...votes, chosen];
-      console.log(newVoteSum);
       newVoteSum.sort((a, b) => a - b);
       setVotes(newVoteSum);
       setTurns(turns + 1);          
@@ -102,54 +99,33 @@ const useRatingState = () => {
   };
 
   const setRenderScore = () =>{
-    let currentScenario = null;
-    let counter = 0;
     let scoring = [];
-    let scoreBoard = [];
+    let scoreBoard = {};
 
-    let obj = {
-      a: 0,
-      b: 0
-    }
-
-    obj = { ...obj, a:1, c:2}
-
-    console.log(obj);
-
-    // console.log(turns);
-    // console.log(votes);
-    
-    for (let i = 0; i < turns; i++) {
-
-      console.log(votes[i])
-
-      if (votes[i] !== currentScenario) {
-        if (counter > 0) {
-          scoring.push({
-            currentScenario: currentScenario,
-            counter: counter
-          });
-        }
-        currentScenario = votes[i];
-        counter = 1;
-      } else {
-        counter++;
+    matches.map(match => {
+      if(scoreBoard[match[0]]){
+        scoreBoard[match[0]] += 1;
+      }else{
+        scoreBoard[match[0]] = 1;
       }
+      }
+    );
+
+    scoring = sortScore(scoreBoard);
+
+    function sortScore(unorganizedScore){
+      let arr = [];
+      for (let [key, value] of Object.entries(unorganizedScore)){
+        arr.push([value, key]);
+      }
+      return arr.sort((a, b) => b[0] - a[0]);
     }
-    if (counter > 0) {
-      scoring.push({
-        currentScenario: currentScenario,
-        counter: counter
-      });
-    }
-  
-    scoring.sort(compare);
 
     return (
       <ul>
         {scoring.map(podium =>
-          <div key={podium.currentScenario}>
-          {fetchScenario(podium.currentScenario)}: has {podium.counter} votes
+          <div key={podium[1]}>
+          {fetchScenario(podium[1])}: has {podium[0]} votes
           </div>)}
       </ul>
     );

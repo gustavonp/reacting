@@ -9,7 +9,8 @@ export const ConfigContext = React.createContext();
 
 const configValue = {
   isDebugActivate: true,
-  IsDatabaseInitialized: IsDatabaseInitialized ? true : false
+  IsDatabaseInitialized: IsDatabaseInitialized ? true : false,
+  isEnough: 5
 };
 
 export default function App(){

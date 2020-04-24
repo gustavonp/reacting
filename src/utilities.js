@@ -182,7 +182,7 @@ function validateComparison(chosenOption, newMatch, oldMatches) {
  */
 export function fetchScenario(id) {
   const allScenarios = scenariosFromDB;
-  const { scenario } = allScenarios.find(c => c.id === id);
+  const { scenario } = allScenarios.find(c => c.id === parseInt(id));
   return scenario;
 }
 
