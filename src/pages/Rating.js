@@ -2,10 +2,9 @@ import React, { useState, useEffect, useContext, useReducer } from "react";
 import { Header } from '../elements/Header';
 import "../MainProgram/style.css";
 import {
-  getFirstMatch,
+  GetFirstMatch,
   reshuffleScenarios,
-  fetchScenario,
-  compare
+  FetchScenario
 } from "../utilities";
 import { ConfigContext } from '../App';
 import RenderOptions from '../utilities/RenderOptions';
@@ -13,7 +12,7 @@ import Enough from '../utilities/Enough';
 
   /*
   TO DO
-  - optimize setRenderScore function
+  - might need to refactor utilities.js
   */
 
 const matchReducer = (state, action) => {
@@ -22,7 +21,43 @@ const matchReducer = (state, action) => {
       return action.data;
     }
     default:{
-      return getFirstMatch();
+      return GetFirstMatch();
+    }
+  }
+};
+
+const scoreReducer = (state, action) => {
+  function setRenderScore(matches){
+    let scoreBoard = {};
+
+    matches.map(match => {
+      if(scoreBoard[match[0]]){
+        scoreBoard[match[0]] += 1;
+      }else{
+        scoreBoard[match[0]] = 1;
+      }
+    }
+    );
+
+    const scoring = (scoreBoard) => {
+      let arr = [];
+      for (let [key, value] of Object.entries(scoreBoard)){
+        arr.push([value, key]);
+      }
+      return arr.sort((a, b) => b[0] - a[0]);
+    }
+    
+    return scoring(scoreBoard);
+  }
+  switch (action.type){
+    case 'score':{
+      return state;
+    }
+    case 'setFinalScore':{
+      return setRenderScore(action.data);
+    }
+    default:{
+      return state;
     }
   }
 };
@@ -33,7 +68,8 @@ const useRatingState = () => {
   const [votes, setVotes] = useState([]);
   const [chosen, setChosem] = useState(null);
   const [turns, setTurns] = useState(0);
-  const [nextMatch, setNextMatch] = useReducer(matchReducer, getFirstMatch());
+  const [nextMatch, setNextMatch] = useReducer(matchReducer, GetFirstMatch());
+  const [score, setScore] = useReducer(scoreReducer, {});
 
   useEffect(() => {
     if(chosen !== null){
@@ -48,6 +84,11 @@ const useRatingState = () => {
 
   const setRatingEnd = () => {
     setIsEnough(true);
+
+    setScore({
+      type: 'setFinalScore',
+      data: matches
+    });
   };
 
   const setNewRating = (newMatch) => {
@@ -99,33 +140,11 @@ const useRatingState = () => {
   };
 
   const setRenderScore = () =>{
-    let scoring = [];
-    let scoreBoard = {};
-
-    matches.map(match => {
-      if(scoreBoard[match[0]]){
-        scoreBoard[match[0]] += 1;
-      }else{
-        scoreBoard[match[0]] = 1;
-      }
-      }
-    );
-
-    scoring = sortScore(scoreBoard);
-
-    function sortScore(unorganizedScore){
-      let arr = [];
-      for (let [key, value] of Object.entries(unorganizedScore)){
-        arr.push([value, key]);
-      }
-      return arr.sort((a, b) => b[0] - a[0]);
-    }
-
     return (
       <ul>
-        {scoring.map(podium =>
+        {score.map(podium =>
           <div key={podium[1]}>
-          {fetchScenario(podium[1])}: has {podium[0]} votes
+          {FetchScenario(podium[1])}: has {podium[0]} votes
           </div>)}
       </ul>
     );
@@ -157,6 +176,7 @@ export const Rating = () =>{
     setUpdatedMatches([...matches, [choice, optionToReplace]]);
     
     setNextTurn(choice, optionToReplace);
+
   };
 
   if(context.IsDatabaseInitialized){
@@ -174,7 +194,7 @@ export const Rating = () =>{
               setRenderScore={setRenderScore}
             />
             <div>
-              <Enough onClick={setRatingEnd} turns={turns} />
+              <Enough onClick={setRatingEnd} turns={turns} isEnough={isEnough} />
               {context.isDebugActivate === false ? null : (
               <p>{`Turns: ${turns}`}<br/>
               {`Votes: ${matches.map(votes => `${votes[0]} - ${votes[1]} | `)}`}</p>

@@ -11,17 +11,24 @@ export const Enough = props => {
 
   const context = useContext(ConfigContext);
 
-  return (
-    <>
-      <button
-        disabled={enoughButton}
-        className="enough-bt"
-        onClick={() => props.onClick()}
-      >
-        Enough!
-      </button>
-    </>
-  );
+  if(!props.isEnough){
+    return (
+      <>
+        <button
+          disabled={enoughButton}
+          className="enough-bt"
+          onClick={() => props.onClick()}
+        >
+          Enough!
+        </button>
+      </>
+    );
+  }else{
+    return(
+      <div></div>
+    );
+  }
+  
 };
 
 export default Enough

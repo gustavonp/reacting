@@ -1,50 +1,54 @@
+import { useMemo, useContext, useState } from 'react';
+import { ConfigContext } from './App';
+
 const scenariosFromDB = JSON.parse(localStorage.getItem("scenarios"));
 
+const useDatabaseState = () =>{
+
+  const [database, setDatabase] = useState(JSON.parse(localStorage.getItem("scenarios")));
+
+  const context = useContext(ConfigContext);
+
+  const allScenarios = useMemo(() => database 
+
+  ,[database]);
+
+  return{
+    database
+  }
+};
+
+const GetDatabase = () =>{
+  const {
+    database
+  } = useDatabaseState();
+
+  return database;
+};
 /**
  * Get the first game match
  */
-export function getFirstMatch() {
-  var scenarios = scenariosFromDB;
-  shuffleScenarios(scenarios);
+export function GetFirstMatch() {
+  
+  const database = GetDatabase();
+
+  shuffleScenarios(database);
   return {
-    firstItem: scenarios[0],
-    secondItem: scenarios[1]
+    firstItem: database[0],
+    secondItem: database[1]
   };
 }
 
 /**
- * Get the next new match
+ * FetchScenario
+ * @param {num} id scenario is
  */
-export function getNextMatch() {
-  var scenarios = scenariosFromDB;
-  var x,
-    y = null;
-
-  for (var i = 0; i < scenarios.length; i++) {
-    if (scenarios[i].id === this.state.nextMatch.firstItem) {
-      x = scenarios[i];
-    }
-    if (scenarios[i].id === this.state.nextMatch.secondItem) {
-      y = scenarios[i];
-    }
-  }
-  return [x, y];
+export function FetchScenario(id) {
+  const database = scenariosFromDB;
+  const { scenario } = database.find(c => c.id === parseInt(id));
+  return scenario;
 }
 
-/**
- * Set next match
- * @param {obj} firstChoice first chosen option
- * @param {obj} secondChoice second chosen option
- */
-export function setNextMatch(firstChoice, secondChoice) {
-  var newObject = {
-    firstItem: firstChoice,
-    secondItem: secondChoice
-  };
-  this.setState({
-    nextMatch: newObject
-  });
-}
 
 /**
  * Grab the whole database and shuffle it
@@ -100,7 +104,7 @@ export function reshuffleScenarios(
           matchedScenarios)
         ) {
           fetchNewScenarios.id1 = optionToReplace;
-          fetchNewScenarios.scenario1 = fetchScenario(optionToReplace);
+          fetchNewScenarios.scenario1 = FetchScenario(optionToReplace);
           fetchNewScenarios.id2 = arrNewSelections[y].id;
           fetchNewScenarios.scenario2 = arrNewSelections[y].scenario;
           break;
@@ -112,7 +116,7 @@ export function reshuffleScenarios(
         validateComparison(chosenOption, newArrToCrop[x].id, matchedScenarios)
       ) {
         fetchNewScenarios.id1 = chosenOption;
-        fetchNewScenarios.scenario1 = fetchScenario(chosenOption);
+        fetchNewScenarios.scenario1 = FetchScenario(chosenOption);
         fetchNewScenarios.id2 = newArrToCrop[x].id;
         fetchNewScenarios.scenario2 = newArrToCrop[x].scenario;
         break;
@@ -174,28 +178,4 @@ function fetchNewPair(matchedScenarios) {
 function validateComparison(chosenOption, newMatch, oldMatches) {
   const checkMatched = oldMatches.filter(ol => ol.includes(chosenOption) && ol.includes(newMatch));
   return checkMatched.length == 0 ? true : false ;
-}
-
-/**
- * fetchScenario
- * @param {num} id scenario is
- */
-export function fetchScenario(id) {
-  const allScenarios = scenariosFromDB;
-  const { scenario } = allScenarios.find(c => c.id === parseInt(id));
-  return scenario;
-}
-
-/**
- * compare
- * @param {obj} a first item to compare
- * @param {obj} b second item to compare
- */
-export function compare(a, b) {
-  const votesA = a.counter;
-  const votesB = b.counter;
-
-  let comparison = votesA < votesB ? 1 : -1;
-
-  return comparison;
 }
