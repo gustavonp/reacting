@@ -1,19 +1,14 @@
 import React, { useState, useEffect, useContext, useReducer } from "react";
 import { Header } from '../elements/Header';
-import "../MainProgram/style.css";
+import "../style/rating.css";
 import {
   GetFirstMatch,
   reshuffleScenarios,
   FetchScenario
-} from "../utilities";
+} from "../utilities/utilities";
 import { ConfigContext } from '../App';
 import RenderOptions from '../utilities/RenderOptions';
 import Enough from '../utilities/Enough';
-
-  /*
-  TO DO
-  - might need to refactor utilities.js
-  */
 
 const matchReducer = (state, action) => {
   switch (action.type){

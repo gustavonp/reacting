@@ -33,3 +33,8 @@ export const IsDatabaseInitialized = () => {
   const isDatabaseInitialized = database.initialize();
   return (isDatabaseInitialized ? true : false);
 }
+
+export const GetDatabase = () =>{
+  const scenariosFromDB = JSON.parse(localStorage.getItem("scenarios"));
+  return scenariosFromDB;
+}

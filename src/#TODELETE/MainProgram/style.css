@@ -1,0 +1,31 @@
+.Scenarios{
+  height: 300px;
+  width: 600px;
+  background-color: #fff;
+  position: relative;
+}
+
+.caseA{
+  float: left;
+  background-color: darkgreen;
+  height:75px;
+  width: 200px;
+}
+
+.or{  
+  float: left;
+  height:75px;
+  width: 200px;
+  text-align: center;
+}
+
+.caseB{
+  float: right;
+  background-color: firebrick;
+  width: 200px;
+  height:75px;
+}
+
+.enoughResults{
+  clear: both;
+}
