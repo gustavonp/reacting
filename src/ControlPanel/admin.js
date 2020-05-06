@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import { createStore } from 'redux';
-import { Provider, connect } from 'react-redux';
 
-// Dependencies
-import LocalStorageDatabase from '../services/database';
+import { GetDatabase } from '../services/database';
+import { ConfigContext } from '../App';
 
-
-/* ==START REDUX STRUCTURE============================= */
+/*
+TO DO==
+- bring the view to the AppAdmin Class
+- check if the rest of the container still can be called
+*/
 
 const update = (model, action) =>{
   const updates = {
@@ -17,106 +17,103 @@ const update = (model, action) =>{
     'UPDATE' : '',
     'DELETE' : ''
   };
-
   return (updates[action.type] || (() => model)) (model);
 };
 
-let model = {
-  '' : ''
-};
+const RenderRow = props =>{
 
-function mapStateToProps(state){
-  return state;
-};
-function mapDispatchToProps(dispatch){
-  return{
-    onCreate: () => {dispatch({type: 'CREATE'});},
-    onRemove: () => {dispatch({type: 'REMOVE'});},
-    onUpdate: () => {dispatch({type: 'UPDATE'});},
-    onDelete: () => {dispatch({type: 'DELETE'});}
-  };
+  // console.log(props);
+
+  return(
+    <tr key={props.mod.id}>
+      <td>{props.mod.id}</td>
+      <td>{props.mod.scenario}</td>
+      <td>{props.mod.category}</td>
+      <td>
+        <button onClick={props.onClick(this)}>Update {props.mod.id}</button>
+      </td>  
+    </tr>
+  );
 }
 
-let View = connect(mapStateToProps, mapDispatchToProps)((props) =>{
+let view = (m, clickFunc) =>{
+
+  // let handler = (event) => {
+  //   console.log(event);
+  //   container.dispatch('UPDATE');
+  // };
+
+
   return (
     <div>
-      hi
-    </div>);
-});
-
-/**
- * Default call for Redux
- */
-let container = createStore(update);
-
-/**
- * List of actions that the administrator can perform
- */
-let intents = {
-  CREATE: 'CREATE',
-  REMOVE: 'REMOVE',
-  UPDATE: 'UPDATE',
-  DELETE: 'DELETE'
+      <table>
+        <tbody>
+        {m.map(mod =>
+          <RenderRow 
+            mod={mod}
+            onClick={clickFunc}
+          />
+        )}
+        </tbody>
+      </table>
+    </div>
+    );
 };
+
+
+const createStore = (reducer) => {  //hooks
+  let dataBase = GetDatabase();
+  let internalState;
+  let handlers = [];
+  return {
+    dispatch: (intent) => {
+      console.log(intent);
+      // internalState = reducer(internalState, intent);
+      // handlers.forEach(h => { h(); });
+    },
+    subscribe: (handler) => {
+      handlers.push(handler);
+    },
+    getState: () => dataBase
+  };
+};
+
 
 /* ====END REDUX STRUCTURE============================= */
 
+const useAdminState = () => {
+  const [database, setDatabase] = useState(GetDatabase());
+  useEffect(() => {
 
-/* ==START ROUTING STRUCTURE=========================== */
-export class AppAdmin extends React.Component {
+  }, []);
 
-  database;
-  isDatabaseInitialized = false;
-
-  constructor(props){
-    super(props);
-
-    this.database = new LocalStorageDatabase();
-    this.isDatabaseInitialized = this.database.initialize();
+  return {
+    database
   }
+}
 
-  render(){
-    if(this.isDatabaseInitialized){
-      return (
-        <p>
-          hello
-        </p>
-        /*
-        <Router>
-          <div>
-            <Switch>
-              <Router path="/ControlPanel/">
-                <Login />
-              </Router>
-              <Router path="/ControlPanel/admin">
-                <ControlPanel />
-              </Router>
-            </Switch>
-          </div>
-        </Router>
-        */
-      );
-    } else {
-      return (
-        <h1>We are experiencing a problem, and that's very irritating. Come back
-          later!</h1>
-      );
-    }
-  }
-};
+//update
+let container = createStore(update);
 
-const Login = () => {
+export const AppAdmin = () =>{
+  const {
+    database
+  } = useAdminState();
+
+  const context = useContext(ConfigContext);
+
+  const handler = props =>{
+    console.log(props);
+    container.dispatch('UPDATE');
+  };
+
+  const viewContent = view(container.getState(), handler);
+
   return(
-    <div>please, log me<br/>
-      <Link to="/">Login</Link>
+    <div>
+      {viewContent}
     </div>
   );
 };
-
-const ControlPanel = () => {
-  return(<div> You are in </div>);
-};
-/* ====END ROUTING STRUCTURE=========================== */
-
 
 export default AppAdmin;
