@@ -69,11 +69,6 @@ function RatingLink(){
 
 function AppAdminLink(){
 
-  let { path, url } = useRouteMatch();
-
-  console.log(useParams());
-  console.log(url);
-
   return (
     <ConfigContext.Provider value={configValue}>
       <AppAdmin 

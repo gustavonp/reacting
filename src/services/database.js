@@ -36,8 +36,11 @@ export const IsDatabaseInitialized = () => {
 
 export const GetDatabase = () =>{
   const scenariosFromDB = JSON.parse(localStorage.getItem("scenarios"));
-
-  // console.log(localStorage);
-
   return scenariosFromDB;
+}
+
+//merge these two later on
+export const GetCategory = () =>{
+  const categoryFromDB = JSON.parse(localStorage.getItem("categories"));
+  return categoryFromDB;
 }

@@ -1,4 +1,4 @@
-import { GetDatabase } from '../services/database'
+import { GetDatabase, GetCategory } from '../services/database'
 
 /**
  * Get the first game match
@@ -21,6 +21,20 @@ export function FetchScenario(id) {
   const database = GetDatabase();
   const { scenario } = database.find(c => c.id === parseInt(id));
   return scenario;
+}
+
+/**
+ * FetchScenarioRow
+ * @param {num} id scenario is
+ */
+export function FetchScenarioRow(id) {
+  const database = GetDatabase();
+  return database.find(c => c.id === parseInt(id));
+}
+
+export function FetchCategories(){
+  const database = GetCategory();
+  return database;
 }
 
 /**

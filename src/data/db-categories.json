@@ -1,23 +1,23 @@
 [
   {
     "id" : 0,
-    "category" : "Olfato"
+    "category" : "Smell"
   },
   {
     "id" : 1,
-    "category" : "Paladar"
+    "category" : "Taste"
   },
   {
     "id" : 2,
-    "category" : "Visão"
+    "category" : "Sight"
   },
   {
     "id" : 3,
-    "category" : "Audição"
+    "category" : "Hearing"
   },
   {
     "id" : 4,
-    "category" : "Tato"
+    "category" : "Tact"
   },
   {
     "id" : 5,
