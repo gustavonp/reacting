@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Link, useParams, useRouteMatch } from "react-router-dom";
 import Home from './pages/Home';
 import Rating from './pages/Rating';
 import AppAdmin from './ControlPanel/admin.js';
@@ -9,11 +9,14 @@ export const ConfigContext = React.createContext();
 
 const configValue = {
   isDebugActivate: true,
-  IsDatabaseInitialized: IsDatabaseInitialized ? true : false,
+  IsDatabaseInitialized: IsDatabaseInitialized() ? true : false,
   isEnough: 5
 };
 
 export default function App(){
+
+  // const heyHere = IsDatabaseInitialized;
+
   return (
     <Router>
       <div>
@@ -32,9 +35,10 @@ export default function App(){
         </nav>
 
         <Switch>
-          <Route path="/AppAdmin">
+          <Route path="/AppAdmin/">
             <AppAdminLink />
           </Route>
+          
           <Route path="/Rating">
             <RatingLink />
           </Route>
@@ -64,9 +68,17 @@ function RatingLink(){
 }
 
 function AppAdminLink(){
+
+  let { path, url } = useRouteMatch();
+
+  console.log(useParams());
+  console.log(url);
+
   return (
     <ConfigContext.Provider value={configValue}>
-      <AppAdmin />
+      <AppAdmin 
+        hello={'world'}
+      />
     </ConfigContext.Provider>
   );
 }
