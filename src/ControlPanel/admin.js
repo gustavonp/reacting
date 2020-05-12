@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useRouteMatch } from "react-router-dom";
+import { BrowserRouter as Router, useHistory, Switch, Route, Link, useParams, useRouteMatch } from "react-router-dom";
 
 import { GetDatabase } from '../services/database';
 import { ConfigContext } from '../App';
@@ -9,10 +9,7 @@ import { FetchScenarioRow, FetchCategories } from "../utilities/utilities";
 
 /*
 TO DO==
-- create route to /edit/[id]
-  - check how to use onChange the Select option 
-  - third, start adding the reducer structure
-
+- third, start adding the reducer structure
 
 - onClick Delete, update database to active to switch between true to false;
 - create a function that, if it received no id, it'll add a new key, otherwise it'll edit the given ID;
@@ -26,7 +23,7 @@ const updateReducer = (model) => {
 const update = (model, action) =>{
   const updates = {
     'CREATE' : '',
-    'REMOVE' : '',
+    'READ' : '',
     'UPDATE' : updateReducer(model),
     // 'UPDATE' : (model) => Object.assign(model,),
     'DELETE' : console.log(`Delete - Model = ${model} | Action = ${action}`)
@@ -62,13 +59,13 @@ let container = createStore(update);
 /* ====END REDUX STRUCTURE============================= */
 
 const RemoveButton = props =>{
-  const editPerId = () =>{
-    container.dispatch('DELETE', props.idToRemove);
+  const handleClick = () =>{
+    console.log(`Delete ${props.idToRemove}`);
   }
   return(
     <>
       <button
-        onClick={editPerId}
+        onClick={handleClick}
       >
       Remove
       </button>
@@ -122,6 +119,9 @@ export const AppAdmin = () => {
             <Link to={`${url}`}>Home</Link>
           </li>
           <li>
+            <Link to={`${url}/add`}>Add</Link>
+          </li>
+          <li>
             <Link to={`${url}/edit`}>Edit</Link>
           </li>
         </ul>
@@ -131,6 +131,11 @@ export const AppAdmin = () => {
         <Switch>
           <Route exact path={`${url}`}>
             <Home
+              rows={database}
+             />
+          </Route>
+          <Route path={`${url}/add`}>
+            <Add
               rows={database}
              />
           </Route>
@@ -183,6 +188,14 @@ function Home(props) {
   );
 }
 
+function Add() {
+  return(
+    <SubmitForm
+      url={'add'} 
+    />
+  );
+}
+
 function Edits(props) {
  
   let { path, url } = useRouteMatch();
@@ -225,8 +238,9 @@ function Edits(props) {
           <h3>Please select a topic.</h3>
         </Route>
         <Route path={`${path}/:scenarioId`}>
-          <ContentForm
+          <SubmitForm
             setNewScenario={props.setNewScenario}
+            url={'edit'}
           />
         </Route>
       </Switch>
@@ -235,63 +249,111 @@ function Edits(props) {
   );
 }
 
-const ContentForm = props =>{
-  let { scenarioId } = useParams();
-  let scenario = FetchScenarioRow(scenarioId);
-  let categories = FetchCategories();
+const SubmitForm = props =>{
 
-  const [tempId, setTempId] = useState({value: scenario.id});
-  const [tempInput, setTempInput] = useState({id: scenario.id, value: scenario.scenario});
-  const [tempOption, setTempOption] = useState({value: scenario.category})
+  let params = { 'scenarioId': null};
+  params = useParams();
+  
+  let categories = FetchCategories(); 
+  let scenario = 'scenarioId' in params ? FetchScenarioRow(params.scenarioId) : null;
+  let history = useHistory();
+  
+  const [tempId, setTempId] = useState(props.url === 'add' ? null : scenario.id);
+  const [tempInput, setTempInput] = useState({value: ''});
+  const [tempOption, setTempOption] = useState({value: ''});
+  const [scenarioEnabled, setScenarioEnabled ] = useState(true);
 
-  if(scenario.id !== tempId.value){
-    setTempId({value: scenario.id});
-    setTempInput({value: scenario.scenario});
-    setTempOption({value: scenario.category});
-  }
-
-  function handleChangeInput(event) {    
-    return setTempInput({value: event.target.value});
+  function handleChangeInput(event) {
+    switch(event.target.className) {
+      case 'Scenario':
+        return setTempInput({value: event.target.value});
+      case 'Category':
+        return setTempOption({value: event.target.value});
+      case 'Enable':
+        return setScenarioEnabled(scenarioEnabled ? false : true);
+      default:
+        event.preventDefault();
+        let UpdatedScenario = {
+          'id' : tempId,
+          'scenario' : tempInput.value,
+          'category' : tempOption.value,
+          'active' : scenarioEnabled
+        }
+    
+        console.log(UpdatedScenario);
+        //--send it to update
+        // history.push("/AppAdmin/edit");
+        return false
+    }
   };
-  
-  function handleChangeSelect(event) {
-    return setTempInput({category: event.target.value});
-  };
 
-  
-  // console.log(scenario.category);
-  
-  
-
-  if(props.length < 1){
-    // console.log('add');
-  }else{
-    // console.log('edit');
-  }
-
-  return(
-    <div>
-      <br/>
+  if(props.url === 'add'){
+    /**
+     * ADD
+     */
+    return(
+      <div>
       <form>
-      <input type="text" value={tempInput.value} onChange={handleChangeInput} />
+          <label>Scenario:</label>
+          <input type="text" className="Scenario" value={tempInput.value} onChange={handleChangeInput} />
+  
+          <label>Category:</label>
+          <select value={tempOption.value} className="Category" onChange={handleChangeInput} >
+            {categories.map(category =>
+              <option 
+                key={category.id}
+                value={category.id}
+              >{category.category}</option>
+            )}
+          </select>
+  
+          <label>Enable:</label>
+          <input type="checkbox" className="Enable" checked={scenarioEnabled} onChange={handleChangeInput}>
+          </input>
+          <label>Save:</label>
+          <button onClick={handleChangeInput} > Add + </button>
+        </form>
+      </div>
+    );
+  }else{
+    /**
+     * --EDIT
+     */
 
-      <select value={tempOption.value} onChange={handleChangeSelect} >
-        {categories.map(category =>
-          <option 
-            key={category.id}
-            value={category.id}
-          >{category.category}</option>
-        )}
-      </select>
-      <button> Add + </button>
-      </form>
-    </div>
-  );
+    if(scenario.id !== tempId.value){
+      setTempId({value: scenario.id});
+      setTempInput({value: scenario.scenario});
+      setTempOption({value: scenario.category});
+      setScenarioEnabled(scenario.active);
+    }
+
+    return(
+      <div>
+        <br/>
+        <form>
+          <label>Scenario:</label>
+          <input type="text" className="Scenario" value={tempInput.value} onChange={handleChangeInput} />
+  
+          <label>Category:</label>
+          <select value={tempOption.value} className="Category" onChange={handleChangeInput} >
+            {categories.map(category =>
+              <option 
+                key={category.id}
+                value={category.id}
+              >{category.category}</option>
+            )}
+          </select>
+  
+          <label>Enable:</label>
+          <input type="checkbox" className="Enable" checked={scenarioEnabled} onChange={handleChangeInput}>
+          </input>
+          <label>Save:</label>
+          <button onClick={handleChangeInput} > Add + </button>
+        </form>
+      </div>
+    ); 
+  }
 };
-
-
-
-
 
 
 
