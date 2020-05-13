@@ -13,10 +13,8 @@ const configValue = {
   isEnough: 5
 };
 
+
 export default function App(){
-
-  // const heyHere = IsDatabaseInitialized;
-
   return (
     <Router>
       <div>
@@ -51,9 +49,10 @@ export default function App(){
   );
 }
 
+
 function HomeLink(){
   return (
-    <ConfigContext.Provider value={configValue}>
+    <ConfigContext.Provider value={configValue} >
       <Home />
     </ConfigContext.Provider>
   );
@@ -68,7 +67,6 @@ function RatingLink(){
 }
 
 function AppAdminLink(){
-
   return (
     <ConfigContext.Provider value={configValue}>
       <AppAdmin 

@@ -2,17 +2,14 @@ import React, { useEffect, useState, useContext } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, useHistory, Switch, Route, Link, useParams, useRouteMatch } from "react-router-dom";
 
-import { GetDatabase } from '../services/database';
+import { GetDatabase, EditScenarios } from '../services/database';
 import { ConfigContext } from '../App';
 import { FetchScenarioRow, FetchCategories } from "../utilities/utilities";
 
 
 /*
 TO DO==
-- third, start adding the reducer structure
-
-- onClick Delete, update database to active to switch between true to false;
-- create a function that, if it received no id, it'll add a new key, otherwise it'll edit the given ID;
+- start adding the reducer structure if possible?
 */
 
 
@@ -60,7 +57,8 @@ let container = createStore(update);
 
 const RemoveButton = props =>{
   const handleClick = () =>{
-    console.log(`Delete ${props.idToRemove}`);
+    EditScenarios('Delete', props.idToRemove);
+    props.setDatabaseUpdate();
   }
   return(
     <>
@@ -91,21 +89,27 @@ const useAdminState = () => {
       'id': newScenario.id ? newScenario.id : null,
       'scenario': newScenario.scenario,
       'category' : newScenario.category,
-      'active' : false
+      'active' : newScenario.active
     });
+
+  }
+
+  const setDatabaseUpdate = () => {
+    setDatabase(GetDatabase());
   }
 
   return {
-    database, setNewScenario
+    database, setNewScenario, setDatabaseUpdate
   }
 }
 
-/* =============TEST============ */
+/* =============ROUTING============ */
 
 export const AppAdmin = () => {
   const {
     database,
-    setNewScenario
+    setNewScenario,
+    setDatabaseUpdate
   } = useAdminState();
   const context = useContext(ConfigContext);
 
@@ -132,17 +136,21 @@ export const AppAdmin = () => {
           <Route exact path={`${url}`}>
             <Home
               rows={database}
+              setDatabaseUpdate={setDatabaseUpdate}
              />
           </Route>
           <Route path={`${url}/add`}>
             <Add
               rows={database}
+              setNewScenario={setNewScenario}
+              setDatabaseUpdate={setDatabaseUpdate}
              />
           </Route>
           <Route path={`${url}/edit`}>
             <Edits
               rows={database}
               setNewScenario={setNewScenario}
+              setDatabaseUpdate={setDatabaseUpdate}
              />
           </Route>
         </Switch>
@@ -178,6 +186,7 @@ function Home(props) {
             <td>
               <RemoveButton
                 idToRemove={row.id}
+                setDatabaseUpdate={props.setDatabaseUpdate}
               />
             </td>
           </tr>
@@ -188,16 +197,19 @@ function Home(props) {
   );
 }
 
-function Add() {
+function Add(props) {
+  
   return(
     <SubmitForm
       url={'add'} 
+      setNewScenario={props.setNewScenario}
+      setDatabaseUpdate={props.setDatabaseUpdate}
     />
   );
 }
 
 function Edits(props) {
- 
+
   let { path, url } = useRouteMatch();
 
   return(
@@ -240,6 +252,7 @@ function Edits(props) {
         <Route path={`${path}/:scenarioId`}>
           <SubmitForm
             setNewScenario={props.setNewScenario}
+            setDatabaseUpdate={props.setDatabaseUpdate}
             url={'edit'}
           />
         </Route>
@@ -276,13 +289,16 @@ const SubmitForm = props =>{
         let UpdatedScenario = {
           'id' : tempId,
           'scenario' : tempInput.value,
-          'category' : tempOption.value,
+          'category' : tempOption.value ? tempOption.value : '0',
           'active' : scenarioEnabled
         }
     
-        console.log(UpdatedScenario);
-        //--send it to update
-        // history.push("/AppAdmin/edit");
+        EditScenarios(props.url === 'add' ? 'Create' : 'Update', UpdatedScenario);
+        props.setDatabaseUpdate();
+
+        // props.setNewScenario(UpdatedScenario);
+        history.push(props.url === 'add' ? '/AppAdmin/' : '/AppAdmin/edit');
+
         return false
     }
   };
