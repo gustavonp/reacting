@@ -2,74 +2,15 @@ import React, { useEffect, useState, useContext } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, useHistory, Switch, Route, Link, useParams, useRouteMatch } from "react-router-dom";
 
-import { GetDatabase, EditScenarios } from '../services/database';
+import { GetDatabase } from '../services/database';
 import { ConfigContext } from '../App';
-import { FetchScenarioRow, FetchCategories } from "../utilities/utilities";
 
+import { Home } from './pages/home';
+import { Add } from './pages/add';
+import { Edits } from './pages/edit';
 
-/*
-TO DO==
-- start adding the reducer structure if possible?
-*/
-
-
-const updateReducer = (model) => {
-  console.log(`Edit - Model = ${model}`);
-};
-
-const update = (model, action) =>{
-  const updates = {
-    'CREATE' : '',
-    'READ' : '',
-    'UPDATE' : updateReducer(model),
-    // 'UPDATE' : (model) => Object.assign(model,),
-    'DELETE' : console.log(`Delete - Model = ${model} | Action = ${action}`)
-  };
-  return (updates[action.type] || (() => model)) (model);
-};
-
-
-const createStore = (reducer) => {  //hooks
-  let dataBase = GetDatabase();
-  let idToEdit = null;
-  let internalState = 0;
-  let handlers = [];
-  return {
-    dispatch: (intent, idValue) => {
-      idToEdit = idValue;
-      console.log(idToEdit);
-      // internalState = reducer(idValue, intent);
-
-      // console.log(internalState);
-      // handlers.forEach(h => { h(); });
-    },
-    subscribe: (handler) => {
-      handlers.push(handler);
-    },
-    getState: () => dataBase
-  };
-};
-
-//update
-let container = createStore(update);
 
 /* ====END REDUX STRUCTURE============================= */
-
-const RemoveButton = props =>{
-  const handleClick = () =>{
-    EditScenarios('Delete', props.idToRemove);
-    props.setDatabaseUpdate();
-  }
-  return(
-    <>
-      <button
-        onClick={handleClick}
-      >
-      Remove
-      </button>
-    </>
-  );
-}
 
 
 const useAdminState = () => {
@@ -91,7 +32,6 @@ const useAdminState = () => {
       'category' : newScenario.category,
       'active' : newScenario.active
     });
-
   }
 
   const setDatabaseUpdate = () => {
@@ -102,8 +42,6 @@ const useAdminState = () => {
     database, setNewScenario, setDatabaseUpdate
   }
 }
-
-/* =============ROUTING============ */
 
 export const AppAdmin = () => {
   const {
@@ -158,225 +96,6 @@ export const AppAdmin = () => {
     </Router>
   );
 }
-
-function Home(props) {
-  return(
-    <div>
-      <h2>Home</h2>
-      <table>
-        <thead>
-          <tr>
-            <td>ID</td>
-            <td>Scenario</td>
-            <td>Category</td>
-            <td>Enabled</td>
-            <td colSpan="2">Controls</td>
-          </tr>
-        </thead>
-        <tbody>
-        {props.rows.map(row =>
-          <tr key={row.id}>
-            <td>{row.id}</td>
-            <td>{row.scenario}</td>
-            <td>{row.category}</td>
-            <td>{row.active ? 'ON' : 'OFF'}</td>
-            <td>
-              
-            </td>
-            <td>
-              <RemoveButton
-                idToRemove={row.id}
-                setDatabaseUpdate={props.setDatabaseUpdate}
-              />
-            </td>
-          </tr>
-        )}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function Add(props) {
-  
-  return(
-    <SubmitForm
-      url={'add'} 
-      setNewScenario={props.setNewScenario}
-      setDatabaseUpdate={props.setDatabaseUpdate}
-    />
-  );
-}
-
-function Edits(props) {
-
-  let { path, url } = useRouteMatch();
-
-  return(
-    <div>
-      <h2>Edit</h2>
-      <table>
-        <thead>
-          <tr>
-            <td>ID</td>
-            <td>Scenario</td>
-            <td>Category</td>
-            <td>Enabled</td>
-            <td colSpan="2">Controls</td>
-          </tr>
-        </thead>
-        <tbody>
-        {props.rows.map(row =>
-          <tr key={row.id}>
-            <td>{row.id}</td>
-            <td>{row.scenario}</td>
-            <td>{row.category}</td>
-            <td>{row.active ? 'ON' : 'OFF'}</td>
-            <td>
-              <Link to={`${url}/${row.id}`}>Edit</Link>
-            </td>
-            <td>
-              {/* <RemoveButton
-                idToRemove={row.id}
-              /> */}
-            </td>
-          </tr>
-        )}
-        </tbody>
-      </table>
-
-      <Switch>
-        <Route exact path={path}>
-          <h3>Please select a topic.</h3>
-        </Route>
-        <Route path={`${path}/:scenarioId`}>
-          <SubmitForm
-            setNewScenario={props.setNewScenario}
-            setDatabaseUpdate={props.setDatabaseUpdate}
-            url={'edit'}
-          />
-        </Route>
-      </Switch>
-
-    </div>
-  );
-}
-
-const SubmitForm = props =>{
-
-  let params = { 'scenarioId': null};
-  params = useParams();
-  
-  let categories = FetchCategories(); 
-  let scenario = 'scenarioId' in params ? FetchScenarioRow(params.scenarioId) : null;
-  let history = useHistory();
-  
-  const [tempId, setTempId] = useState(props.url === 'add' ? null : scenario.id);
-  const [tempInput, setTempInput] = useState({value: ''});
-  const [tempOption, setTempOption] = useState({value: ''});
-  const [scenarioEnabled, setScenarioEnabled ] = useState(true);
-
-  function handleChangeInput(event) {
-    switch(event.target.className) {
-      case 'Scenario':
-        return setTempInput({value: event.target.value});
-      case 'Category':
-        return setTempOption({value: event.target.value});
-      case 'Enable':
-        return setScenarioEnabled(scenarioEnabled ? false : true);
-      default:
-        event.preventDefault();
-        let UpdatedScenario = {
-          'id' : tempId,
-          'scenario' : tempInput.value,
-          'category' : tempOption.value ? tempOption.value : '0',
-          'active' : scenarioEnabled
-        }
-    
-        EditScenarios(props.url === 'add' ? 'Create' : 'Update', UpdatedScenario);
-        props.setDatabaseUpdate();
-
-        // props.setNewScenario(UpdatedScenario);
-        history.push(props.url === 'add' ? '/AppAdmin/' : '/AppAdmin/edit');
-
-        return false
-    }
-  };
-
-  if(props.url === 'add'){
-    /**
-     * ADD
-     */
-    return(
-      <div>
-      <form>
-          <label>Scenario:</label>
-          <input type="text" className="Scenario" value={tempInput.value} onChange={handleChangeInput} />
-  
-          <label>Category:</label>
-          <select value={tempOption.value} className="Category" onChange={handleChangeInput} >
-            {categories.map(category =>
-              <option 
-                key={category.id}
-                value={category.id}
-              >{category.category}</option>
-            )}
-          </select>
-  
-          <label>Enable:</label>
-          <input type="checkbox" className="Enable" checked={scenarioEnabled} onChange={handleChangeInput}>
-          </input>
-          <label>Save:</label>
-          <button onClick={handleChangeInput} > Add + </button>
-        </form>
-      </div>
-    );
-  }else{
-    /**
-     * --EDIT
-     */
-
-    if(scenario.id !== tempId.value){
-      setTempId({value: scenario.id});
-      setTempInput({value: scenario.scenario});
-      setTempOption({value: scenario.category});
-      setScenarioEnabled(scenario.active);
-    }
-
-    return(
-      <div>
-        <br/>
-        <form>
-          <label>Scenario:</label>
-          <input type="text" className="Scenario" value={tempInput.value} onChange={handleChangeInput} />
-  
-          <label>Category:</label>
-          <select value={tempOption.value} className="Category" onChange={handleChangeInput} >
-            {categories.map(category =>
-              <option 
-                key={category.id}
-                value={category.id}
-              >{category.category}</option>
-            )}
-          </select>
-  
-          <label>Enable:</label>
-          <input type="checkbox" className="Enable" checked={scenarioEnabled} onChange={handleChangeInput}>
-          </input>
-          <label>Save:</label>
-          <button onClick={handleChangeInput} > Add + </button>
-        </form>
-      </div>
-    ); 
-  }
-};
-
-
-
-
-
-
-
 
 
 export default AppAdmin;

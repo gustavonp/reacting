@@ -4,11 +4,18 @@ import "../style/rating.css";
 import {
   GetFirstMatch,
   reshuffleScenarios,
-  FetchScenario
+  FetchScenario,
+  setCategoryPercentage
 } from "../utilities/utilities";
 import { ConfigContext } from '../App';
 import RenderOptions from '../utilities/RenderOptions';
 import Enough from '../utilities/Enough';
+
+/**
+ * TO DO--
+ * 
+ * sum all category and get its percentage
+ */
 
 const matchReducer = (state, action) => {
   switch (action.type){
@@ -42,6 +49,8 @@ const scoreReducer = (state, action) => {
       return arr.sort((a, b) => b[0] - a[0]);
     }
     
+    setCategoryPercentage(scoring(scoreBoard));
+
     return scoring(scoreBoard);
   }
   switch (action.type){

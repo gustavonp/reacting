@@ -1,10 +1,10 @@
-import { GetDatabase, GetCategory } from '../services/database'
+import { GetDatabase, GetCategory, GetPlayableScenarios } from '../services/database'
 
 /**
  * Get the first game match
  */
 export function GetFirstMatch() {
-  const database = GetDatabase();
+  const database = GetPlayableScenarios();
 
   shuffleScenarios(database);
   return {
@@ -18,7 +18,7 @@ export function GetFirstMatch() {
  * @param {num} id scenario is
  */
 export function FetchScenario(id) {
-  const database = GetDatabase();
+  const database = GetPlayableScenarios();
   const { scenario } = database.find(c => c.id === parseInt(id));
   return scenario;
 }
@@ -28,9 +28,14 @@ export function FetchScenario(id) {
  * @param {num} id scenario is
  */
 export function FetchScenarioRow(id) {
-  const database = GetDatabase();
+  const database = GetPlayableScenarios();
   return database.find(c => c.id === parseInt(id));
 }
+
+function FetchCategoryId(scenarioId) {
+  let scenario = FetchScenarioRow(scenarioId);
+  return scenario.category;
+};
 
 export function FetchCategories(){
   const database = GetCategory();
@@ -72,7 +77,7 @@ export function reshuffleScenarios(
     scenario2: ""
   };
 
-  const allScenarios = GetDatabase();
+  const allScenarios = GetPlayableScenarios();
   const arrNewSelections = allScenarios.filter(as => as.id !== chosenOption && as.id !== optionToReplace);
   const newTry = matchedScenarios.filter(ms => ms.includes(chosenOption));
   var newArrToCrop = arrNewSelections;
@@ -126,7 +131,7 @@ export function reshuffleScenarios(
  * @param {obj} matchedScenarios all previously matched scenarios
  */
 function fetchNewPair(matchedScenarios) {
-  const allScenarios = GetDatabase();
+  const allScenarios = GetPlayableScenarios();
   shuffleScenarios(allScenarios);
 
   var newScenario = {
@@ -163,5 +168,42 @@ function fetchNewPair(matchedScenarios) {
  */
 function validateComparison(chosenOption, newMatch, oldMatches) {
   const checkMatched = oldMatches.filter(ol => ol.includes(chosenOption) && ol.includes(newMatch));
-  return checkMatched.length == 0 ? true : false ;
+  return checkMatched.length === 0 ? true : false ;
+}
+
+
+export function setCategoryPercentage (scoreBoard) {
+  let categoryScore = scoreBoard.reduce((result, item) => {
+    result[FetchCategoryId(item[1])] = FetchCategoryId(item[1]) in result ? 
+      (result[FetchCategoryId(item[1])] + item[0]) : 
+      item[0];
+    return result
+  }, {});
+
+  // console.log(categoryScore);
+
+
+  let totalValue = 0;
+  Object.values(categoryScore).reduce((result, item, key) => {
+    totalValue += item;
+  }, {});
+
+  console.log(`totalValue ${totalValue}`);
+  console.log(`categoryScore points ${Object.keys(categoryScore).length}`);
+
+
+  
+
+  // 1- salva a soma de todos
+  // 2- pega o valor
+  // 3- calcule a porcentagem
+  // 4- retorne a porcentagem ao ID escolhido
+
+  /**
+   * 
+   * (x / sum) * 100
+   * 
+   */
+  
+  // return categoryScore
 }

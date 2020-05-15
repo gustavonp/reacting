@@ -43,6 +43,12 @@ export const GetDatabase = () =>{
   return scenariosFromDB;
 }
 
+export const GetPlayableScenarios = () =>{
+  const scenariosFromDB = JSON.parse(localStorage.getItem("scenarios"));
+  const filteredDB = scenariosFromDB.filter(db => db.active === true);
+  return filteredDB;
+}
+
 //merge these two later on
 export const GetCategory = () =>{
   const categoryFromDB = JSON.parse(localStorage.getItem("categories"));
@@ -52,9 +58,9 @@ export const GetCategory = () =>{
 export const EditScenarios = (type, data) => {
   let scenariosFromDB = JSON.parse(localStorage.getItem('scenarios'));
   switch(type) {
-    case 'Create': createScenario(data, scenariosFromDB);
-    case 'Update': updateScenario(data, scenariosFromDB);
-    case 'Delete': deleteScenario(data, scenariosFromDB);
+    case 'Create': createScenario(data, scenariosFromDB); break;
+    case 'Update': updateScenario(data, scenariosFromDB); break;
+    case 'Delete': deleteScenario(data, scenariosFromDB); break;
     default: return false;
   }
 }
@@ -72,6 +78,7 @@ const createScenario = (props, scenariosFromDB) => {
 }
 
 const updateScenario = (props, scenariosFromDB) => {
+
   let updatedRow = {
     'id' : props.id.value,
     'scenario' : props.scenario,
@@ -79,13 +86,13 @@ const updateScenario = (props, scenariosFromDB) => {
     'active' : props.active
   }
 
-  let objIndex = scenariosFromDB.findIndex((obj => obj.id == props.id.value));
+  let objIndex = scenariosFromDB.findIndex((obj => obj.id === props.id.value));
   scenariosFromDB[objIndex] = updatedRow;
   updateLocalStorage(scenariosFromDB, 'scenarios');
 }
 
 const deleteScenario = (props, scenariosFromDB) => {
-  let objIndex = scenariosFromDB.findIndex((obj => obj.id == props));
+  let objIndex = scenariosFromDB.findIndex((obj => obj.id === props));
   scenariosFromDB.splice(objIndex, 1);
   updateLocalStorage(scenariosFromDB, 'scenarios');
 }
