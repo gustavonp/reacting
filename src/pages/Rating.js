@@ -5,7 +5,8 @@ import {
   GetFirstMatch,
   reshuffleScenarios,
   FetchScenario,
-  setCategoryPercentage
+  FetchCategories,
+  FetchCategory
 } from "../utilities/utilities";
 import { ConfigContext } from '../App';
 import RenderOptions from '../utilities/RenderOptions';
@@ -48,8 +49,6 @@ const scoreReducer = (state, action) => {
       }
       return arr.sort((a, b) => b[0] - a[0]);
     }
-    
-    setCategoryPercentage(scoring(scoreBoard));
 
     return scoring(scoreBoard);
   }
@@ -66,6 +65,14 @@ const scoreReducer = (state, action) => {
   }
 };
 
+const setCategoriesObj = () =>{
+  let categories = {}
+  FetchCategories().map(cat => {
+    categories[cat.category] = { 'id': cat.id, 'percentage' : 0 }
+  });
+  return categories
+}
+
 const useRatingState = () => {
   const [isEnough, setIsEnough] = useState(false);
   const [matches, setMatches] = useState([]);
@@ -74,6 +81,7 @@ const useRatingState = () => {
   const [turns, setTurns] = useState(0);
   const [nextMatch, setNextMatch] = useReducer(matchReducer, GetFirstMatch());
   const [score, setScore] = useReducer(scoreReducer, {});
+  const [categoryPercentage, setCategoryPercentage] = useState(setCategoriesObj())
 
   useEffect(() => {
     if(chosen !== null){
@@ -89,11 +97,28 @@ const useRatingState = () => {
   const setRatingEnd = () => {
     setIsEnough(true);
 
+    setCategoryPonctuaton();
+
     setScore({
       type: 'setFinalScore',
       data: matches
     });
   };
+
+  const setCategoryPonctuaton = () => {
+    let tempCategoryPercentage = categoryPercentage;
+    
+    votes.map(vote =>{
+      let tempObj = FetchCategory(vote);
+      tempCategoryPercentage[tempObj.category].percentage += 1;
+    });
+
+    FetchCategories().map(category =>{
+      tempCategoryPercentage[category.category].percentage = (tempCategoryPercentage[category.category].percentage / turns) * 100;
+    });
+
+    setCategoryPercentage(tempCategoryPercentage);
+  }
 
   const setNewRating = (newMatch) => {
     setNextMatch({
@@ -145,17 +170,27 @@ const useRatingState = () => {
 
   const setRenderScore = () =>{
     return (
-      <ul>
-        {score.map(podium =>
-          <div key={podium[1]}>
-          {FetchScenario(podium[1])}: has {podium[0]} votes
-          </div>)}
-      </ul>
+      <div>
+        <ul>
+          {score.map(podium =>
+            <div key={podium[1]}>
+            {FetchScenario(podium[1])}: has {podium[0]} votes
+            </div>)}
+        </ul>
+        <hr/>
+        <ul>
+          {FetchCategories().map(c =>
+            <li key={c.category}>
+              {c.category}: {categoryPercentage[c.category].percentage}%
+            </li>
+          )}
+        </ul>
+      </div>
     );
   };
 
   return {
-    isEnough, matches, turns, nextMatch, setRatingEnd, setMadeChoice, setNextTurn, setUpdatedMatches, setRenderScore
+    isEnough, matches, turns, nextMatch, categoryPercentage, setRatingEnd, setMadeChoice, setNextTurn, setUpdatedMatches, setRenderScore
   }
 };
   
@@ -165,6 +200,7 @@ export const Rating = () =>{
     matches,
     turns,
     nextMatch,
+    categoryPercentage,
     setRatingEnd,
     setMadeChoice,
     setNextTurn,
@@ -196,6 +232,7 @@ export const Rating = () =>{
               isEnough={isEnough} 
               onScenarioClick={onScenarioClick}
               setRenderScore={setRenderScore}
+              categoryPercentage={categoryPercentage}
             />
             <div>
               <Enough onClick={setRatingEnd} turns={turns} isEnough={isEnough} />

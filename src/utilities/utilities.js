@@ -1,4 +1,4 @@
-import { GetDatabase, GetCategory, GetPlayableScenarios } from '../services/database'
+import { GetCategory, GetPlayableScenarios } from '../services/database'
 
 /**
  * Get the first game match
@@ -32,10 +32,21 @@ export function FetchScenarioRow(id) {
   return database.find(c => c.id === parseInt(id));
 }
 
-function FetchCategoryId(scenarioId) {
+export function FetchCategoryId(scenarioId) {
   let scenario = FetchScenarioRow(scenarioId);
   return scenario.category;
 };
+
+export function FetchCategory(scenarioId){
+  let scenario = FetchScenarioRow(scenarioId);  
+  let category
+  FetchCategories().map(categ => {
+    if(categ.id == scenario.category){
+      category = categ;
+    }
+  });
+  return category ? category : false;
+}
 
 export function FetchCategories(){
   const database = GetCategory();
