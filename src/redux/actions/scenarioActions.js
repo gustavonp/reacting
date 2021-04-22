@@ -9,6 +9,7 @@ export function loadScenariosSuccess(scenarios){
   return { type: types.LOAD_SCENARIOS_SUCCESS, scenarios }
 }
 
+//thunk
 export function loadScenarios(){
   return function (dispatch) {
     return scenarioApi.getScenarios().then(scenarios => {

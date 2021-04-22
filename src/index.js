@@ -1,11 +1,11 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { Provider as ReduxProvider } from 'react-redux';
+import configureStore from './redux/configureStore';
 import App from './components/App';
 import './index.css';
-import configureStore from './redux/configureStore';
-import { Provider as ReduxProvider } from 'react-redux';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const store = configureStore();
 
@@ -16,3 +16,9 @@ render(
     <App />
   </Router>
 </ReduxProvider>, document.getElementById('app')); 
+
+/**
+ * Database:
+ * [ ] - Update DB
+ *    [ ] - find out how to make hashes
+ */
