@@ -25,16 +25,6 @@ const ScenariosContainer = () => {
 
   return (<Scenarios scenarios={scenarios} />);
 
-  // return (
-  //   <React.Fragment>
-  //     <h2>Scenarios?</h2>
-  //     {scenarioList.map(scenario => (
-  //       <div key={scenario.description}>
-  //         <div >{scenario.description}</div>
-  //       </div>
-  //     ))}
-  //   </React.Fragment>
-  // );
 }
 
 export default ScenariosContainer;

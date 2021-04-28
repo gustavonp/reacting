@@ -3,6 +3,7 @@ import { Route, Switch } from 'react-router-dom';
 import { Wrapper } from './styles';
 
 import Scenarios from './Scenarios';
+import Scenario from './Scenario';
 import Home from './Home';
 
 const ControlPanel = () => {
@@ -11,7 +12,8 @@ const ControlPanel = () => {
     <Wrapper>
       <Switch>
         <Route exact path="/controlpanel/" component={Home} />
-        <Route exact path="/controlpanel/scenarios" component={Scenarios} />
+        <Route path="/controlpanel/scenario/:scenarioId?" component={Scenario} />
+        <Route path="/controlpanel/scenarios/:scenarioId?" component={Scenarios} />
         {/*
         <Route exact path="/controlpanel/categories" component={} />
         <Route exact path="/controlpanel/votes" component={} />
